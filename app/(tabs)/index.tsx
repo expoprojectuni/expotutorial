@@ -11,6 +11,9 @@ export default function Index() {
       <Link href="/servicios" style={styles.button}>
         Go to servicios screen
       </Link>
+      <Link href="/contact" style={styles.button}>
+        Go to Contact screen
+      </Link>
     </View>
   );
 }
