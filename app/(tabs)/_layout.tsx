@@ -2,6 +2,16 @@ import { Tabs } from "expo-router";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
 
+// Navegacion basica que se pone en los tabs 
+// export default function TabLayout() {
+//   return (
+//     <Tabs>
+//       <Tabs.Screen name="index" options={{ title: 'Home' }} />
+//       <Tabs.Screen name="about" options={{ title: 'About' }} />
+//     </Tabs>
+//   );
+// }
+
 export default function TabLayout() {
   return (
     <Tabs
