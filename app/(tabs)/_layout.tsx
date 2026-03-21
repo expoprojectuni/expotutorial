@@ -1,59 +1,15 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { Tabs } from "expo-router";
-
-// Navegacion basica que se pone en los tabs
-// export default function TabLayout() {
-//   return (
-//     <Tabs>
-//       <Tabs.Screen name="index" options={{ title: 'Home' }} />
-//       <Tabs.Screen name="about" options={{ title: 'About' }} />
-//     </Tabs>
-//   );
-// }
+import { CounterProvider } from "../../context/CounterContext";
 
 export default function TabLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: "#ffd33d",
-        headerStyle: {
-          backgroundColor: "#27ae24ff",
-        },
-        headerShadowVisible: false,
-        headerTintColor: "#fff",
-        tabBarStyle: {
-          backgroundColor: "#0952abff",
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "business-outline" : "home-outline"}
-              color={color}
-              size={24}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="about"
-        options={{
-          title: "About",
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={
-                focused ? "information-circle" : "information-circle-outline"
-              }
-              color={color}
-              size={24}
-            />
-          ),
-        }}
-      />
-    </Tabs>
+    <CounterProvider>
+      {" "}
+      {/* 👈 Envuelve todo aquí */}
+      <Tabs>
+        <Tabs.Screen name="index" options={{ title: "Incrementar" }} />
+        <Tabs.Screen name="about" options={{ title: "Decrementar" }} />
+      </Tabs>
+    </CounterProvider>
   );
 }

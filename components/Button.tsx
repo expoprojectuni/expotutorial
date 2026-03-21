@@ -1,52 +1,61 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type Props = {
   label: string;
+  count?: number; // 👈 recibe el count como prop
   theme?: "primary";
-  onPress?: () => void;
+  onPress?: () => void; // 👈 recibe la acción como prop
 };
 
-export default function Button({ label, theme, onPress }: Props) {
-  if (theme === "primary") {
-    return (
-      <View
-        style={[
-          styles.buttonContainer,
-          { borderWidth: 4, borderColor: "#ffd33d", borderRadius: 18 },
-        ]}
-      >
-        <Pressable
-          style={[styles.button, { backgroundColor: "#fff" }]}
-          onPress={onPress}
-        >
-          <FontAwesome
-            name="picture-o"
-            size={18}
-            color="#25292e"
-            style={styles.buttonIcon}
-          />
-          <Text style={[styles.buttonLabel, { color: "#25292e" }]}>
-            {label}
-          </Text>
-        </Pressable>
-      </View>
-    );
-  }
-
+export default function Button({ label, count, theme, onPress }: Props) {
   return (
     <View style={styles.buttonContainer}>
       <Pressable
-        style={styles.button}
-        onPress={() => alert("You pressed a button.")}
+        style={[styles.button, theme === "primary" && styles.primaryButton]}
+        onPress={onPress} // 👈 usa el onPress que le pasan
       >
         <Text style={styles.buttonLabel}>{label}</Text>
+        {count !== undefined && <Text style={styles.textConteo}>{count}</Text>}
       </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#347ad0ff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  textIncrement: {
+    color: "black",
+    borderRadius: 5,
+    backgroundColor: "red",
+    padding: 10,
+  },
+  textDecrement: {
+    color: "#ffffff19",
+  },
+  textConteo: {
+    color: "black",
+  },
+
+  imageContainer: {
+    marginTop: 100,
+    flex: 1,
+  },
+  image: {
+    width: 320,
+    height: 440,
+    borderRadius: 18,
+    paddingTop: 100,
+  },
+
+  footerContainer: {
+    flex: 1 / 3,
+    alignItems: "center",
+  },
   buttonContainer: {
     width: 320,
     height: 68,
@@ -56,6 +65,14 @@ const styles = StyleSheet.create({
     padding: 3,
   },
   button: {
+    borderRadius: 10,
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+  },
+  primaryButton: {
     borderRadius: 10,
     width: "100%",
     height: "100%",

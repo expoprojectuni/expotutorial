@@ -1,16 +1,26 @@
-import { Link } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useCounter } from "../../context/CounterContext"; // 👈
 
 export default function AboutScreen() {
+  const { count, decrement } = useCounter(); // 👈 ya no hay useState
+
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>About screen</Text>
-      <Link href="/" style={styles.button}>
-        Go to Home screen
-      </Link>
+      <Pressable onPress={decrement}>
+        {" "}
+        {/* 👈 llamas decrement del context */}
+        <Text style={styles.textDecrement}>Decrementar</Text>
+      </Pressable>
+
+      <View style={{ backgroundColor: "red", padding: 10 }}>
+        <Text>Valor del conteo:</Text>
+        <Text>{count}</Text>
+      </View>
     </View>
   );
 }
+
+// styles igual que antes...
 
 const styles = StyleSheet.create({
   container: {
@@ -19,8 +29,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  text: {
+  textDecrement: {
     color: "#fff",
+    borderWidth: 5,
+    padding: 10,
+    backgroundColor: "red",
   },
 
   button: {
@@ -30,5 +43,8 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     backgroundColor: "blue",
     alignItems: "center",
+  },
+  textCount: {
+    color: "#fff",
   },
 });

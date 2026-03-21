@@ -1,45 +1,27 @@
-import Button from "@/components/Button";
-import ImageViewer from "@/components/ImageViewer";
-import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
-import { StyleSheet, View } from "react-native";
-const PlaceholderImage = require("@/assets/images/images/background-image.png");
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useCounter } from "../../context/CounterContext"; // 👈 importas el hook
 
 export default function Index() {
-  const [selectedImage, setSelectedImage] = useState(null);
-  const pickImageAsync = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsEditing: true,
-      quality: 1,
-    });
+  const { count, increment } = useCounter(); // 👈 ya no hay useState
 
-    if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
-      console.log(result);
-    } else {
-      alert("You did not select any image.");
-    }
-  };
   return (
     <View style={styles.container}>
-      <View style={styles.imageContainer}>
-        <ImageViewer
-          imgSource={PlaceholderImage}
-          selectedImage={selectedImage}
-        />
-      </View>
-      <View style={styles.footerContainer}>
-        <Button
-          theme="primary"
-          label="Choose a photo"
-          onPress={pickImageAsync}
-        />
-        <Button label="Use this photo" />
+      <Pressable onPress={increment}>
+        {" "}
+        {/* 👈 llamas increment del context */}
+        <Text style={styles.textIncrement}>Incrementar</Text>
+        <Text style={styles.textConteo}>{count}</Text>
+      </Pressable>
+
+      <View style={{ backgroundColor: "red", padding: 10 }}>
+        <Text>Valor del conteo:</Text>
+        <Text>{count}</Text>
       </View>
     </View>
   );
 }
+
+// styles igual que antes...
 
 const styles = StyleSheet.create({
   container: {
@@ -48,16 +30,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  text: {
+  textIncrement: {
+    color: "black",
+    borderRadius: 5,
+    backgroundColor: "red",
+    padding: 10,
+  },
+  textDecrement: {
     color: "#ffffff19",
   },
-  button: {
-    fontSize: 20,
-    textDecorationLine: "underline",
-    color: "#cfbabaff",
-    paddingTop: 20,
-    backgroundColor: "blue",
-    alignItems: "center",
+  textConteo: {
+    color: "black",
   },
 
   imageContainer: {
