@@ -2,9 +2,9 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type Props = {
   label: string;
-  count?: number; // 👈 recibe el count como prop
+  count?: number;
   theme?: "primary";
-  onPress?: () => void; // 👈 recibe la acción como prop
+  onPress?: () => void;
 };
 
 export default function Button({ label, count, theme, onPress }: Props) {
@@ -12,7 +12,7 @@ export default function Button({ label, count, theme, onPress }: Props) {
     <View style={styles.buttonContainer}>
       <Pressable
         style={[styles.button, theme === "primary" && styles.primaryButton]}
-        onPress={onPress} // 👈 usa el onPress que le pasan
+        onPress={onPress}
       >
         <Text style={styles.buttonLabel}>{label}</Text>
         {count !== undefined && <Text style={styles.textConteo}>{count}</Text>}

@@ -1,8 +1,8 @@
 import { Image, StyleSheet, Text, View } from "react-native";
-import { usePokemon } from "../../context/PokemonContext"; // 👈
+import { usePokemon } from "../../context/PokemonContext";
 
 export default function AboutScreen() {
-  const { pokemon } = usePokemon(); // 👈
+  const { pokemon } = usePokemon();
 
   const tipos = pokemon?.types?.map((t: any) => t.type.name).join(", ");
 
@@ -28,7 +28,10 @@ export default function AboutScreen() {
         <Text style={styles.infoLabel}>imagen shiny</Text>
 
         <Text style={styles.infoValue}>
-          peso pokemon: {pokemon ? `${pokemon.weight / 10} kg` : ""}
+          peso pokemon:{" "}
+          {pokemon
+            ? `${pokemon.weight / 10 < 1 ? `${pokemon.weight} gramos` : `${pokemon.weight / 10} kilogramos`}`
+            : ""}
         </Text>
         <Text style={styles.infoValue}>tipos de pokemon: {tipos}</Text>
       </View>
@@ -39,7 +42,7 @@ export default function AboutScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#25292e",
+    backgroundColor: "red",
     alignItems: "center",
     paddingTop: 60,
     paddingHorizontal: 20,

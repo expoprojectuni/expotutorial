@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  ActivityIndicator,
   Image,
   Pressable,
   StyleSheet,
@@ -8,17 +7,15 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { usePokemon } from "../../context/PokemonContext"; // 👈
+import { usePokemon } from "../../context/PokemonContext";
 
 export default function Index() {
   const [nombre, setNombre] = useState("");
-  const { pokemon, setPokemon } = usePokemon(); // 👈
-  const [cargando, setCargando] = useState(false);
+  const { pokemon, setPokemon } = usePokemon();
   const [error, setError] = useState("");
 
   const consultar = async () => {
     if (!nombre.trim()) return;
-    setCargando(true);
     setError("");
     setPokemon(null);
     try {
@@ -30,10 +27,12 @@ export default function Index() {
       setPokemon(data);
     } catch (e: any) {
       setError(e.message);
-    } finally {
-      setCargando(false);
     }
   };
+
+  const habilidades = pokemon?.abilities
+    ?.map((a: any) => a.ability.name)
+    .join(", ");
 
   return (
     <View style={styles.container}>
@@ -51,13 +50,6 @@ export default function Index() {
         <Text style={styles.buttonText}>Consultar</Text>
       </Pressable>
 
-      {cargando && (
-        <ActivityIndicator
-          size="large"
-          color="#fff"
-          style={{ marginTop: 20 }}
-        />
-      )}
       {error !== "" && <Text style={styles.error}>{error}</Text>}
 
       {pokemon && (
@@ -71,8 +63,12 @@ export default function Index() {
           )}
           <Text style={styles.infoLabel}>imagen frontal</Text>
           <Text style={styles.infoValue}>
-            altura pokemon: {pokemon.height / 10} m
+            altura pokemon:{" "}
+            {pokemon.height / 10 < 1
+              ? `${pokemon.height * 10} centrimetos`
+              : `${pokemon.height / 10} metros`}
           </Text>
+          <Text style={styles.infoValue}>habilidades: {habilidades}</Text>
         </View>
       )}
     </View>
@@ -82,7 +78,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#347ad0ff",
+    backgroundColor: "red",
     alignItems: "center",
     paddingTop: 60,
     paddingHorizontal: 20,
@@ -146,7 +142,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   error: {
-    color: "#ff4444",
+    color: "black",
     marginTop: 10,
     fontSize: 15,
   },
