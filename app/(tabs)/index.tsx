@@ -8,10 +8,11 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { usePokemon } from "../../context/PokemonContext"; // 👈
 
 export default function Index() {
   const [nombre, setNombre] = useState("");
-  const [pokemon, setPokemon] = useState<any>(null);
+  const { pokemon, setPokemon } = usePokemon(); // 👈
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
 
@@ -65,6 +66,7 @@ export default function Index() {
             <Image
               source={{ uri: pokemon.sprites.front_default }}
               style={styles.image}
+              resizeMode="contain"
             />
           )}
           <Text style={styles.infoLabel}>imagen frontal</Text>
