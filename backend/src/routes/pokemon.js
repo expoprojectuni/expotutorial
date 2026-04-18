@@ -13,7 +13,25 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/pokemon/:id — uno por id
+// GET /api/pokemon/nombre/:nombre — buscar por nombre
+router.get("/nombre/:nombre", async (req, res) => {
+  try {
+    const { nombre } = req.params;
+    const result = await pool.query(
+      "SELECT * FROM pokemon WHERE nombre ILIKE $1",
+      [nombre],
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Pokémon no encontrado" });
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/pokemon/:id — buscar por id
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
