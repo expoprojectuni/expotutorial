@@ -1,0 +1,60 @@
+openapi: 3.0.0
+info:
+  title: Pokemon API
+  version: 1.0.0
+  description: Microservicio de Pokémon con Node.js y PostgreSQL
+
+paths:
+  /api/pokemon:
+    get:
+      summary: Obtener todos los pokémon
+      responses:
+        "200":
+          description: Lista de pokémon
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pokemon"
+
+  /api/pokemon/{id}:
+    get:
+      summary: Obtener un pokémon por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Pokémon encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pokemon"
+        "404":
+          description: No encontrado
+
+components:
+  schemas:
+    Pokemon:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        imagen_frontal:
+          type: string
+        imagen_posterior:
+          type: string
+        imagen_shiny:
+          type: string
+        altura:
+          type: number
+        peso:
+          type: number
+        tipos:
+          type: string
