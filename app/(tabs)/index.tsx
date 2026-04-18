@@ -20,7 +20,7 @@ export default function Index() {
     setPokemon(null);
     try {
       const res = await fetch(
-        `https://pokeapi.co/api/v2/pokemon/${nombre.toLowerCase().trim()}`,
+        `https://expotutorial.onrender.com/api/pokemon/nombre/${nombre.toLowerCase().trim()}`,
       );
       if (!res.ok) throw new Error("Pokémon no encontrado");
       const data = await res.json();
