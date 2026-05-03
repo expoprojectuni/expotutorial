@@ -1,12 +1,12 @@
 import { Stack } from "expo-router";
-import { PokemonProvider } from "../context/PokemonContext";
+import { AnimeProvider } from "../context/AnimeContext";
 
 export default function RootLayout() {
   return (
-    <PokemonProvider>
+    <AnimeProvider>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
-    </PokemonProvider>
+    </AnimeProvider>
   );
 }

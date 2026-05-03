@@ -1,16 +1,12 @@
 import { Tabs } from "expo-router";
-import { CounterProvider } from "../../context/CounterContext";
-import { PokemonProvider } from "../../context/PokemonContext"; // 👈 nuevo
 
 export default function TabLayout() {
   return (
-    <CounterProvider>
-      <PokemonProvider>
-        <Tabs>
-          <Tabs.Screen name="index" options={{ title: "Incrementar" }} />
-          <Tabs.Screen name="about" options={{ title: "Decrementar" }} />
-        </Tabs>
-      </PokemonProvider>
-    </CounterProvider>
+    <Tabs>
+      <Tabs.Screen name="saint-seiya" options={{ title: "Saint Seiya" }} />
+      <Tabs.Screen name="hunter-x-hunter" options={{ title: "Hunter x Hunter" }} />
+      <Tabs.Screen name="one-piece" options={{ title: "One Piece" }} />
+      <Tabs.Screen name="index" options={{ title: "Resumen" }} />
+    </Tabs>
   );
 }

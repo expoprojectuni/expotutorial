@@ -1,35 +1,12 @@
-import {
-  Image,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-
-interface ImagenInfo {
-  uri: string | null;
-  label: string;
-  encontrado: boolean;
-}
+import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 interface ModalImagenesProps {
   visible: boolean;
-  imagenes: ImagenInfo[];
-  source: "local" | "internet" | null;
-  imagenesError: string[];
+  imagenes: string[];
   onClose: () => void;
 }
 
-export default function ModalImagenes({
-  visible,
-  imagenes,
-  source,
-  imagenesError,
-  onClose,
-}: ModalImagenesProps) {
-  const encontradas = imagenes.filter((i) => i.encontrado);
+export default function ModalImagenes({ visible, imagenes, onClose }: ModalImagenesProps) {
   const total = imagenes.length;
 
   return (
@@ -42,7 +19,7 @@ export default function ModalImagenes({
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            Imágenes ({encontradas.length}/{total})
+            Imagenes ({total})
           </Text>
           <Pressable style={styles.closeBtn} onPress={onClose}>
             <Text style={styles.closeText}>Cerrar</Text>
@@ -50,34 +27,22 @@ export default function ModalImagenes({
         </View>
 
         <ScrollView contentContainerStyle={styles.scroll}>
-          {imagenesError.length > 0 &&
-            imagenesError.map((err, i) => (
-              <Text key={i} style={styles.error}>{err}</Text>
-            ))}
-
-          <View style={styles.grid}>
-            {imagenes.map((img, i) => (
-              <View key={i} style={styles.slot}>
-                {img.encontrado ? (
-                  <>
-                    <Image
-                      source={{ uri: img.uri! }}
-                      style={styles.image}
-                      resizeMode="contain"
-                    />
-                    <Text style={styles.label}>{img.label}</Text>
-                  </>
-                ) : (
-                  <>
-                    <View style={styles.placeholder}>
-                      <Text style={styles.placeholderText}>No disponible</Text>
-                    </View>
-                    <Text style={styles.label}>{img.label}</Text>
-                  </>
-                )}
-              </View>
-            ))}
-          </View>
+          {total === 0 ? (
+            <Text style={styles.error}>No hay imagenes disponibles</Text>
+          ) : (
+            <View style={styles.grid}>
+              {imagenes.map((url, i) => (
+                <View key={i} style={styles.slot}>
+                  <Image
+                    source={{ uri: url }}
+                    style={styles.image}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.label}>Imagen {i + 1}</Text>
+                </View>
+              ))}
+            </View>
+          )}
         </ScrollView>
       </View>
     </Modal>
@@ -141,19 +106,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     color: "#ddd",
     fontWeight: "600",
-    textAlign: "center",
-  },
-  placeholder: {
-    width: 100,
-    height: 100,
-    backgroundColor: "#333",
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  placeholderText: {
-    fontSize: 11,
-    color: "#888",
     textAlign: "center",
   },
 });
