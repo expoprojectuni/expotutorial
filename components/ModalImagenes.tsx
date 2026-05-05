@@ -12,99 +12,144 @@ export default function ModalImagenes({ visible, imagenes, onClose }: ModalImage
   return (
     <Modal
       visible={visible}
-      animationType="slide"
-      transparent={false}
+      transparent={true}
+      animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>
-            Imagenes ({total})
-          </Text>
-          <Pressable style={styles.closeBtn} onPress={onClose}>
-            <Text style={styles.closeText}>Cerrar</Text>
-          </Pressable>
-        </View>
+      <Pressable style={styles.backdrop} onPress={onClose}>
+        <View
+          style={styles.modalContainer}
+          onStartShouldSetResponder={() => true}
+        >
+          <View style={styles.header}>
+            <Text style={styles.title}>Imágenes ({total})</Text>
+            <Pressable style={styles.closeButton} onPress={onClose}>
+              <Text style={styles.closeButtonText}>✕</Text>
+            </Pressable>
+          </View>
 
-        <ScrollView contentContainerStyle={styles.scroll}>
-          {total === 0 ? (
-            <Text style={styles.error}>No hay imagenes disponibles</Text>
-          ) : (
-            <View style={styles.grid}>
-              {imagenes.map((url, i) => (
-                <View key={i} style={styles.slot}>
-                  <Image
-                    source={{ uri: url }}
-                    style={styles.image}
-                    resizeMode="contain"
-                  />
-                  <Text style={styles.label}>Imagen {i + 1}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-        </ScrollView>
-      </View>
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {total === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No hay imágenes disponibles</Text>
+              </View>
+            ) : (
+              <View style={styles.grid}>
+                {imagenes.map((url, i) => (
+                  <View key={i} style={styles.imageSlot}>
+                    <Image
+                      source={{ uri: url }}
+                      style={styles.image}
+                      resizeMode="contain"
+                    />
+                    <Text style={styles.imageLabel}>Imagen {i + 1}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          </ScrollView>
+        </View>
+      </Pressable>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  backdrop: {
     flex: 1,
+    backgroundColor: "rgba(0,0,0,0.75)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalContainer: {
+    width: "100%",
+    maxWidth: 500,
+    maxHeight: "85%",
     backgroundColor: "#1a1a1a",
+    borderRadius: 20,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
+    padding: 20,
     backgroundColor: "#b00",
   },
   title: {
     color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+    letterSpacing: 0.5,
+  },
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "#b00",
     fontSize: 18,
     fontWeight: "bold",
   },
-  closeBtn: {
-    borderWidth: 2,
-    borderColor: "#fff",
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+  scrollView: {
+    flex: 1,
   },
-  closeText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "bold",
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 32,
   },
-  scroll: {
-    padding: 12,
+  emptyContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 40,
   },
-  error: {
+  emptyText: {
     color: "#f66",
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "bold",
-    marginBottom: 8,
+    textAlign: "center",
   },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "center",
-    gap: 12,
+    justifyContent: "space-between",
+    gap: 16,
   },
-  slot: {
+  imageSlot: {
+    width: "48%",
     alignItems: "center",
-    width: 140,
+    backgroundColor: "#2a2a2a",
+    borderRadius: 12,
+    padding: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: "100%",
+    height: 150,
+    borderRadius: 8,
   },
-  label: {
+  imageLabel: {
+    color: "#ccc",
     fontSize: 12,
-    marginTop: 4,
-    color: "#ddd",
+    marginTop: 8,
     fontWeight: "600",
     textAlign: "center",
   },
