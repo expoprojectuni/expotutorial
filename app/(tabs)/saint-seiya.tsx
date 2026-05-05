@@ -1,9 +1,9 @@
+import ModalImagenes from "@/components/ModalImagenes";
+import { Personaje, useAnime } from "@/context/AnimeContext";
 import { useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { useAnime, Personaje } from "@/context/AnimeContext";
-import ModalImagenes from "@/components/ModalImagenes";
 
-const API_URL = "http://localhost:3000/api";
+const API_URL = "https://pokedex-backend-production-cd5c.up.railway.app/api";
 
 export default function SaintSeiyaScreen() {
   const [nombre, setNombre] = useState("");
