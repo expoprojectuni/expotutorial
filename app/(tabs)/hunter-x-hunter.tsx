@@ -8,6 +8,11 @@ const PRIMARY = "#228B22";
 const PRIMARY_DARK = "#1A6B1A";
 const ACCENT = "#90EE90";
 
+const PERSONAJES_DISPONIBLES = [
+  "Gon", "Killua", "Hisoka", "Kurapika", "Leorio",
+  "Meruem", "Chrollo", "Illumi", "Netero", "Neferpitou"
+];
+
 export default function HunterXHunterScreen() {
   const [nombre, setNombre] = useState("");
   const { personajes, setPersonaje } = useAnime();
@@ -110,6 +115,19 @@ export default function HunterXHunterScreen() {
           imagenes={imagenesModal}
           onClose={() => setMostrarModal(false)}
         />
+
+        <Text style={styles.sectionTitle}>Personajes Disponibles</Text>
+        <View style={styles.listContainer}>
+          {PERSONAJES_DISPONIBLES.map((nombre) => (
+            <Pressable
+              key={nombre}
+              style={styles.listItem}
+              onPress={() => setNombre(nombre.toLowerCase())}
+            >
+              <Text style={styles.listItemText}>{nombre}</Text>
+            </Pressable>
+          ))}
+        </View>
       </View>
     </ScrollView>
   );
@@ -256,5 +274,33 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     letterSpacing: 0.5,
+  },
+  sectionTitle: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "700",
+    marginTop: 8,
+    marginBottom: 12,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    alignSelf: "flex-start",
+  },
+  listContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    width: "100%",
+    justifyContent: "flex-start",
+    gap: 8,
+  },
+  listItem: {
+    backgroundColor: "#fff",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  listItemText: {
+    color: PRIMARY_DARK,
+    fontSize: 12,
+    fontWeight: "600",
   },
 });

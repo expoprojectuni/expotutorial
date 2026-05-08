@@ -1,12 +1,17 @@
 import ModalImagenes from "@/components/ModalImagenes";
 import { Personaje, useAnime } from "@/context/AnimeContext";
 import { useState } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View, FlatList } from "react-native";
 
 const API_URL = "https://pokedex-backend-production-cd5c.up.railway.app/api";
 const PRIMARY = "#DAA520";
 const PRIMARY_DARK = "#B8860B";
 const ACCENT = "#FFD700";
+
+const PERSONAJES_DISPONIBLES = [
+  "Seiya", "Shiryu", "Hyoga", "Shun", "Ikki",
+  "Aiolia", "Saga", "Milo", "Shaka", "Dohko"
+];
 
 export default function SaintSeiyaScreen() {
   const [nombre, setNombre] = useState("");
@@ -110,6 +115,19 @@ export default function SaintSeiyaScreen() {
           imagenes={imagenesModal}
           onClose={() => setMostrarModal(false)}
         />
+
+        <Text style={styles.sectionTitle}>Personajes Disponibles</Text>
+        <View style={styles.listContainer}>
+          {PERSONAJES_DISPONIBLES.map((nombre) => (
+            <Pressable
+              key={nombre}
+              style={styles.listItem}
+              onPress={() => setNombre(nombre.toLowerCase())}
+            >
+              <Text style={styles.listItemText}>{nombre}</Text>
+            </Pressable>
+          ))}
+        </View>
       </View>
     </ScrollView>
   );
@@ -256,5 +274,33 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     letterSpacing: 0.5,
+  },
+  sectionTitle: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "700",
+    marginTop: 8,
+    marginBottom: 12,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    alignSelf: "flex-start",
+  },
+  listContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    width: "100%",
+    justifyContent: "flex-start",
+    gap: 8,
+  },
+  listItem: {
+    backgroundColor: "#fff",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  listItemText: {
+    color: PRIMARY_DARK,
+    fontSize: 12,
+    fontWeight: "600",
   },
 });
