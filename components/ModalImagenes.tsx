@@ -1,5 +1,14 @@
 import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+const BG = "#0A0E1A";
+const SURFACE = "#141A2E";
+const SURFACE_ALT = "#1B2238";
+const BORDER = "#2A3458";
+const TEXT = "#E8EAF6";
+const TEXT_DIM = "#8A93B8";
+const TEXT_MUTED = "#5A6285";
+const NEON_PURPLE = "#B14EFF";
+
 interface ModalImagenesProps {
   visible: boolean;
   imagenes: string[];
@@ -22,7 +31,10 @@ export default function ModalImagenes({ visible, imagenes, onClose }: ModalImage
           onStartShouldSetResponder={() => true}
         >
           <View style={styles.header}>
-            <Text style={styles.title}>Imágenes ({total})</Text>
+            <View>
+              <Text style={styles.eyebrow}>{"// galería"}</Text>
+              <Text style={styles.title}>imágenes <Text style={styles.titleCount}>({total})</Text></Text>
+            </View>
             <Pressable style={styles.closeButton} onPress={onClose}>
               <Text style={styles.closeButtonText}>✕</Text>
             </Pressable>
@@ -35,7 +47,8 @@ export default function ModalImagenes({ visible, imagenes, onClose }: ModalImage
           >
             {total === 0 ? (
               <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>No hay imágenes disponibles</Text>
+                <Text style={styles.emptyGlyph}>◇</Text>
+                <Text style={styles.emptyText}>sin imágenes disponibles</Text>
               </View>
             ) : (
               <View style={styles.grid}>
@@ -46,7 +59,10 @@ export default function ModalImagenes({ visible, imagenes, onClose }: ModalImage
                       style={styles.image}
                       resizeMode="contain"
                     />
-                    <Text style={styles.imageLabel}>Imagen {i + 1}</Text>
+                    <Text style={styles.imageLabel}>
+                      <Text style={styles.imageLabelDim}>img / </Text>
+                      {String(i + 1).padStart(2, "0")}
+                    </Text>
                   </View>
                 ))}
               </View>
@@ -61,96 +77,117 @@ export default function ModalImagenes({ visible, imagenes, onClose }: ModalImage
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.75)",
+    backgroundColor: "rgba(5,7,15,0.92)",
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: 16,
   },
   modalContainer: {
     width: "100%",
-    maxWidth: 500,
-    maxHeight: "85%",
-    backgroundColor: "#1a1a1a",
-    borderRadius: 20,
+    maxWidth: 520,
+    maxHeight: "88%",
+    backgroundColor: BG,
+    borderRadius: 4,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
+    borderWidth: 1,
+    borderColor: BORDER,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 20,
-    backgroundColor: "#b00",
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    backgroundColor: SURFACE,
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER,
+  },
+  eyebrow: {
+    color: NEON_PURPLE,
+    fontSize: 10,
+    letterSpacing: 3,
+    fontWeight: "500",
+    marginBottom: 4,
   },
   title: {
-    color: "#fff",
+    color: TEXT,
     fontSize: 20,
-    fontWeight: "bold",
-    letterSpacing: 0.5,
+    fontWeight: "300",
+    letterSpacing: -0.5,
+  },
+  titleCount: {
+    color: NEON_PURPLE,
+    fontWeight: "500",
   },
   closeButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#fff",
+    width: 34,
+    height: 34,
+    borderRadius: 2,
+    borderWidth: 1,
+    borderColor: BORDER,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "transparent",
   },
   closeButtonText: {
-    color: "#b00",
-    fontSize: 18,
-    fontWeight: "bold",
+    color: TEXT_DIM,
+    fontSize: 14,
+    fontWeight: "400",
   },
   scrollView: {
     flex: 1,
+    backgroundColor: BG,
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 32,
+    paddingBottom: 28,
   },
   emptyContainer: {
     alignItems: "center",
     justifyContent: "center",
-    padding: 40,
+    paddingVertical: 60,
+  },
+  emptyGlyph: {
+    color: NEON_PURPLE,
+    fontSize: 36,
+    marginBottom: 14,
   },
   emptyText: {
-    color: "#f66",
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
+    color: TEXT_DIM,
+    fontSize: 14,
+    fontWeight: "400",
+    letterSpacing: 0.5,
   },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    gap: 16,
+    gap: 12,
   },
   imageSlot: {
     width: "48%",
     alignItems: "center",
-    backgroundColor: "#2a2a2a",
-    borderRadius: 12,
-    padding: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: SURFACE_ALT,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 10,
   },
   image: {
     width: "100%",
     height: 150,
-    borderRadius: 8,
+    borderRadius: 2,
   },
   imageLabel: {
-    color: "#ccc",
-    fontSize: 12,
+    color: TEXT,
+    fontSize: 11,
     marginTop: 8,
-    fontWeight: "600",
+    fontWeight: "500",
     textAlign: "center",
+    letterSpacing: 1.5,
+  },
+  imageLabelDim: {
+    color: TEXT_MUTED,
+    fontWeight: "400",
   },
 });

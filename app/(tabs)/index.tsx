@@ -3,9 +3,16 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useAnime } from "@/context/AnimeContext";
 import ModalImagenes from "@/components/ModalImagenes";
 
-const PRIMARY = "#8B0000";
-const PRIMARY_DARK = "#660000";
-const ACCENT = "#FF6B6B";
+const BG = "#0A0E1A";
+const SURFACE = "#141A2E";
+const BORDER = "#2A3458";
+const TEXT = "#E8EAF6";
+const TEXT_DIM = "#8A93B8";
+const TEXT_MUTED = "#5A6285";
+const NEON_PURPLE = "#B14EFF";
+const SAINT = "#FF2E93";
+const HUNTER = "#7CFF6B";
+const PIRATE = "#3DDDFF";
 
 export default function ResumenScreen() {
   const { personajes } = useAnime();
@@ -19,92 +26,36 @@ export default function ResumenScreen() {
   const todasImagenes = todosPersonajes.flatMap((p) => (p ? p.imagenes : []));
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContent}>
+    <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>RESUMEN</Text>
-        <Text style={styles.headerSubtitle}>Personajes consultados</Text>
+        <Text style={styles.eyebrow}>{"// dashboard"}</Text>
+        <Text style={styles.headerTitle}>resumen</Text>
+        <View style={styles.accentLine} />
+        <Text style={styles.headerSubtitle}>personajes consultados en sesión</Text>
       </View>
 
       <View style={styles.container}>
         {todosPersonajes.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No se han consultado personajes aun</Text>
-            <Text style={styles.emptyHint}>Usa las pestañas para buscar personajes</Text>
+            <Text style={styles.emptyGlyph}>◇</Text>
+            <Text style={styles.emptyText}>sin consultas todavía</Text>
+            <Text style={styles.emptyHint}>navega a las pestañas para buscar personajes</Text>
           </View>
         ) : (
           <>
-            {saints && (
-              <View style={[styles.card, { borderLeftColor: "#DAA520" }]}>
-                <View style={styles.cardHeader}>
-                  <Text style={[styles.animeTitle, { color: "#DAA520" }]}>Saint Seiya</Text>
-                </View>
-                <View style={styles.cardBody}>
-                  <Text style={styles.cardName}>{saints.nombre.toUpperCase()}</Text>
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Descripcion</Text>
-                    <Text style={styles.infoValue}>{saints.descripcion}</Text>
-                  </View>
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Habilidades</Text>
-                    <Text style={styles.infoValue}>{saints.habilidades}</Text>
-                  </View>
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Imagenes</Text>
-                    <Text style={styles.infoValue}>{saints.imagenes.length} recuperadas</Text>
-                  </View>
-                </View>
-              </View>
-            )}
+            <View style={styles.statsRow}>
+              <StatPill label="series" value={String(todosPersonajes.length)} />
+              <StatPill label="imágenes" value={String(todasImagenes.length)} />
+            </View>
 
-            {hunters && (
-              <View style={[styles.card, { borderLeftColor: "#228B22" }]}>
-                <View style={styles.cardHeader}>
-                  <Text style={[styles.animeTitle, { color: "#228B22" }]}>Hunter x Hunter</Text>
-                </View>
-                <View style={styles.cardBody}>
-                  <Text style={styles.cardName}>{hunters.nombre.toUpperCase()}</Text>
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Descripcion</Text>
-                    <Text style={styles.infoValue}>{hunters.descripcion}</Text>
-                  </View>
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Habilidades</Text>
-                    <Text style={styles.infoValue}>{hunters.habilidades}</Text>
-                  </View>
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Imagenes</Text>
-                    <Text style={styles.infoValue}>{hunters.imagenes.length} recuperadas</Text>
-                  </View>
-                </View>
-              </View>
-            )}
-
-            {pirates && (
-              <View style={[styles.card, { borderLeftColor: "#1E90FF" }]}>
-                <View style={styles.cardHeader}>
-                  <Text style={[styles.animeTitle, { color: "#1E90FF" }]}>One Piece</Text>
-                </View>
-                <View style={styles.cardBody}>
-                  <Text style={styles.cardName}>{pirates.nombre.toUpperCase()}</Text>
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Descripcion</Text>
-                    <Text style={styles.infoValue}>{pirates.descripcion}</Text>
-                  </View>
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Habilidades</Text>
-                    <Text style={styles.infoValue}>{pirates.habilidades}</Text>
-                  </View>
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Imagenes</Text>
-                    <Text style={styles.infoValue}>{pirates.imagenes.length} recuperadas</Text>
-                  </View>
-                </View>
-              </View>
-            )}
+            {saints && <PersonajeCard data={saints} accent={SAINT} label="saint seiya" tag="01" />}
+            {hunters && <PersonajeCard data={hunters} accent={HUNTER} label="hunter x hunter" tag="02" />}
+            {pirates && <PersonajeCard data={pirates} accent={PIRATE} label="one piece" tag="03" />}
 
             {todasImagenes.length > 0 && (
               <Pressable style={styles.imagesButton} onPress={() => setMostrarModal(true)}>
-                <Text style={styles.imagesButtonText}>Ver todas las imagenes ({todasImagenes.length})</Text>
+                <Text style={styles.imagesButtonText}>▸ ver galería completa</Text>
+                <Text style={styles.imagesButtonCount}>{todasImagenes.length}</Text>
               </Pressable>
             )}
           </>
@@ -120,123 +71,227 @@ export default function ResumenScreen() {
   );
 }
 
+function StatPill({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.statPill}>
+      <Text style={styles.statValue}>{value}</Text>
+      <Text style={styles.statLabel}>{label}</Text>
+    </View>
+  );
+}
+
+function PersonajeCard({
+  data,
+  accent,
+  label,
+  tag,
+}: {
+  data: { nombre: string; descripcion: string; habilidades: string; imagenes: string[] };
+  accent: string;
+  label: string;
+  tag: string;
+}) {
+  return (
+    <View style={[styles.card, { borderColor: accent }]}>
+      <View style={styles.cardTop}>
+        <Text style={[styles.cardTag, { color: accent }]}>{tag}</Text>
+        <Text style={[styles.cardLabel, { color: accent }]}>{label}</Text>
+      </View>
+      <Text style={styles.cardName}>{data.nombre.toLowerCase()}</Text>
+      <View style={[styles.divider, { backgroundColor: accent + "30" }]} />
+      <View style={styles.infoRow}>
+        <Text style={styles.infoLabel}>descripción</Text>
+        <Text style={styles.infoValue}>{data.descripcion}</Text>
+      </View>
+      <View style={styles.infoRow}>
+        <Text style={styles.infoLabel}>habilidades</Text>
+        <Text style={styles.infoValue}>{data.habilidades}</Text>
+      </View>
+      <View style={styles.infoRow}>
+        <Text style={styles.infoLabel}>imágenes</Text>
+        <Text style={[styles.infoValue, { color: accent }]}>{data.imagenes.length} recuperadas</Text>
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  scroll: {
+    backgroundColor: BG,
+  },
   scrollContent: {
     flexGrow: 1,
+    backgroundColor: BG,
   },
   header: {
-    backgroundColor: PRIMARY_DARK,
-    paddingTop: 60,
-    paddingBottom: 24,
-    paddingHorizontal: 20,
-    alignItems: "center",
+    paddingTop: 70,
+    paddingBottom: 32,
+    paddingHorizontal: 24,
+    backgroundColor: BG,
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER,
+  },
+  eyebrow: {
+    color: NEON_PURPLE,
+    fontSize: 12,
+    letterSpacing: 3,
+    marginBottom: 6,
+    fontWeight: "500",
   },
   headerTitle: {
-    color: "#fff",
-    fontSize: 28,
-    fontWeight: "900",
-    letterSpacing: 2,
+    color: TEXT,
+    fontSize: 42,
+    fontWeight: "300",
+    letterSpacing: -1,
+  },
+  accentLine: {
+    height: 2,
+    width: 40,
+    backgroundColor: NEON_PURPLE,
+    marginTop: 14,
+    marginBottom: 14,
   },
   headerSubtitle: {
-    color: ACCENT,
-    fontSize: 14,
-    marginTop: 4,
-    fontStyle: "italic",
+    color: TEXT_DIM,
+    fontSize: 13,
+    letterSpacing: 0.5,
   },
   container: {
     flex: 1,
-    backgroundColor: PRIMARY,
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 30,
-    paddingBottom: 40,
+    paddingHorizontal: 24,
+    paddingTop: 28,
+    paddingBottom: 60,
+    backgroundColor: BG,
   },
   emptyState: {
     alignItems: "center",
-    marginTop: 60,
+    marginTop: 80,
     paddingHorizontal: 20,
   },
+  emptyGlyph: {
+    color: NEON_PURPLE,
+    fontSize: 48,
+    marginBottom: 20,
+  },
   emptyText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "600",
+    color: TEXT,
+    fontSize: 17,
+    fontWeight: "400",
     textAlign: "center",
     marginBottom: 8,
+    letterSpacing: 0.3,
   },
   emptyHint: {
-    color: "#ffaaaa",
-    fontSize: 14,
+    color: TEXT_MUTED,
+    fontSize: 13,
     textAlign: "center",
+    letterSpacing: 0.3,
+  },
+  statsRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 20,
+  },
+  statPill: {
+    flex: 1,
+    backgroundColor: SURFACE,
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 4,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+  },
+  statValue: {
+    color: TEXT,
+    fontSize: 28,
+    fontWeight: "200",
+    letterSpacing: -0.5,
+  },
+  statLabel: {
+    color: TEXT_MUTED,
+    fontSize: 11,
+    letterSpacing: 2,
+    marginTop: 2,
   },
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
+    backgroundColor: SURFACE,
+    borderRadius: 4,
     width: "100%",
-    marginBottom: 16,
-    overflow: "hidden",
-    borderLeftWidth: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 8,
+    marginBottom: 14,
+    padding: 18,
+    borderLeftWidth: 2,
+    borderTopWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderTopColor: BORDER,
+    borderRightColor: BORDER,
+    borderBottomColor: BORDER,
   },
-  cardHeader: {
-    padding: 12,
-    paddingBottom: 8,
+  cardTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 8,
   },
-  animeTitle: {
-    fontSize: 14,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-  },
-  cardBody: {
-    padding: 16,
-    paddingTop: 8,
-  },
-  cardName: {
-    fontSize: 20,
-    fontWeight: "800",
-    marginBottom: 12,
-    textTransform: "uppercase",
-    color: "#333",
-  },
-  infoRow: {
-    marginBottom: 10,
-  },
-  infoLabel: {
-    color: PRIMARY_DARK,
+  cardTag: {
     fontSize: 11,
     fontWeight: "700",
-    textTransform: "uppercase",
     letterSpacing: 1,
+  },
+  cardLabel: {
+    fontSize: 11,
+    letterSpacing: 2.5,
+    fontWeight: "500",
+  },
+  cardName: {
+    fontSize: 24,
+    fontWeight: "300",
+    color: TEXT,
+    letterSpacing: -0.5,
+  },
+  divider: {
+    height: 1,
+    width: "100%",
+    marginVertical: 14,
+  },
+  infoRow: {
+    marginBottom: 12,
+  },
+  infoLabel: {
+    color: TEXT_MUTED,
+    fontSize: 10,
+    fontWeight: "600",
+    letterSpacing: 2,
     marginBottom: 4,
   },
   infoValue: {
-    color: "#333",
-    fontSize: 14,
+    color: TEXT,
+    fontSize: 13,
     lineHeight: 20,
+    fontWeight: "300",
   },
   imagesButton: {
-    backgroundColor: PRIMARY_DARK,
-    borderRadius: 12,
-    paddingHorizontal: 40,
-    paddingVertical: 14,
-    marginTop: 8,
-    marginBottom: 16,
-    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 5,
+    backgroundColor: "transparent",
+    borderRadius: 4,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+    marginTop: 8,
+    width: "100%",
+    borderWidth: 1,
+    borderColor: NEON_PURPLE,
   },
   imagesButtonText: {
-    color: "#fff",
+    color: NEON_PURPLE,
+    fontSize: 13,
+    fontWeight: "500",
+    letterSpacing: 1.5,
+  },
+  imagesButtonCount: {
+    color: NEON_PURPLE,
     fontSize: 14,
     fontWeight: "700",
-    letterSpacing: 0.5,
   },
 });

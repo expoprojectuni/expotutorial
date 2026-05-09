@@ -1,16 +1,23 @@
 import ModalImagenes from "@/components/ModalImagenes";
 import { Personaje, useAnime } from "@/context/AnimeContext";
 import { useState } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View, FlatList } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://pokedex-backend-production-cd5c.up.railway.app/api";
-const PRIMARY = "#DAA520";
-const PRIMARY_DARK = "#B8860B";
-const ACCENT = "#FFD700";
+
+const BG = "#0A0E1A";
+const SURFACE = "#141A2E";
+const BORDER = "#2A3458";
+const TEXT = "#E8EAF6";
+const TEXT_DIM = "#8A93B8";
+const TEXT_MUTED = "#5A6285";
+const ACCENT = "#FF2E93";
+const ACCENT_SOFT = "#FF2E9322";
 
 const PERSONAJES_DISPONIBLES = [
-  "Seiya", "Shiryu", "Hyoga", "Shun", "Ikki",
-  "Aiolia", "Saga", "Milo", "Shaka", "Dohko"
+  "Mu de Aries", "Camus de Acuario", "Aldebaran de Tauro",
+  "Deathmask de Cáncer", "Aioros de Sagitario", "Shura de Capricornio",
+  "Afrodita de Piscis", "Kanon de Géminis", "Radamanthys", "Thanatos"
 ];
 
 export default function SaintSeiyaScreen() {
@@ -54,57 +61,65 @@ export default function SaintSeiyaScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContent}>
+    <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>SAINT SEIYA</Text>
-        <Text style={styles.headerSubtitle}>Caballeros del Zodiaco</Text>
+        <Text style={styles.eyebrow}>{"// serie 01"}</Text>
+        <Text style={styles.headerTitle}>saint seiya</Text>
+        <View style={styles.accentLine} />
+        <Text style={styles.headerSubtitle}>caballeros del zodiaco</Text>
       </View>
 
       <View style={styles.container}>
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Nombre del personaje</Text>
+          <Text style={styles.label}>nombre del personaje</Text>
           <TextInput
             style={styles.input}
             value={nombre}
             onChangeText={setNombre}
-            placeholder="Ej: seiya, shiryu, hyoga..."
-            placeholderTextColor="#999"
+            placeholder="ej: mu de aries, camus de acuario, kanon..."
+            placeholderTextColor={TEXT_MUTED}
           />
         </View>
 
         <Pressable style={styles.button} onPress={consultarPersonaje}>
-          <Text style={styles.buttonText}>Consultar</Text>
+          <Text style={styles.buttonText}>▸ consultar</Text>
         </Pressable>
 
         {error !== "" && (
           <View style={styles.errorBox}>
+            <Text style={styles.errorGlyph}>!</Text>
             <Text style={styles.error}>{error}</Text>
           </View>
         )}
 
         {personaje && (
           <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>{personaje.nombre.toUpperCase()}</Text>
+            <View style={styles.cardTop}>
+              <Text style={styles.cardTag}>resultado</Text>
+              <View style={styles.dot} />
+              <Text style={styles.cardLabel}>activo</Text>
             </View>
-            <View style={styles.cardBody}>
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Descripcion</Text>
-                <Text style={styles.infoValue}>{personaje.descripcion}</Text>
-              </View>
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Habilidades</Text>
-                <Text style={styles.infoValue}>{personaje.habilidades}</Text>
-              </View>
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Imagenes</Text>
-                <Text style={styles.infoValue}>{personaje.imagenes.length} recuperadas</Text>
-              </View>
+            <Text style={styles.cardTitle}>{personaje.nombre.toLowerCase()}</Text>
+            <View style={styles.divider} />
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>descripción</Text>
+              <Text style={styles.infoValue}>{personaje.descripcion}</Text>
+            </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>habilidades</Text>
+              <Text style={styles.infoValue}>{personaje.habilidades}</Text>
+            </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>imágenes</Text>
+              <Text style={[styles.infoValue, { color: ACCENT }]}>{personaje.imagenes.length} recuperadas</Text>
             </View>
 
             {personaje.imagenes.length > 0 && (
-              <Pressable style={styles.imagesButton} onPress={() => { setImagenesModal(personaje.imagenes); setMostrarModal(true); }}>
-                <Text style={styles.imagesButtonText}>Ver Imagenes ({personaje.imagenes.length})</Text>
+              <Pressable
+                style={styles.imagesButton}
+                onPress={() => { setImagenesModal(personaje.imagenes); setMostrarModal(true); }}
+              >
+                <Text style={styles.imagesButtonText}>ver imágenes ({personaje.imagenes.length})</Text>
               </Pressable>
             )}
           </View>
@@ -116,15 +131,15 @@ export default function SaintSeiyaScreen() {
           onClose={() => setMostrarModal(false)}
         />
 
-        <Text style={styles.sectionTitle}>Personajes Disponibles</Text>
+        <Text style={styles.sectionTitle}>{"› personajes disponibles"}</Text>
         <View style={styles.listContainer}>
-          {PERSONAJES_DISPONIBLES.map((nombre) => (
+          {PERSONAJES_DISPONIBLES.map((n) => (
             <Pressable
-              key={nombre}
+              key={n}
               style={styles.listItem}
-              onPress={() => setNombre(nombre.toLowerCase())}
+              onPress={() => setNombre(n.toLowerCase())}
             >
-              <Text style={styles.listItemText}>{nombre}</Text>
+              <Text style={styles.listItemText}>{n.toLowerCase()}</Text>
             </Pressable>
           ))}
         </View>
@@ -134,173 +149,215 @@ export default function SaintSeiyaScreen() {
 }
 
 const styles = StyleSheet.create({
-  scrollContent: {
-    flexGrow: 1,
-  },
+  scroll: { backgroundColor: BG },
+  scrollContent: { flexGrow: 1, backgroundColor: BG },
   header: {
-    backgroundColor: PRIMARY_DARK,
-    paddingTop: 60,
-    paddingBottom: 24,
-    paddingHorizontal: 20,
-    alignItems: "center",
+    paddingTop: 70,
+    paddingBottom: 32,
+    paddingHorizontal: 24,
+    backgroundColor: BG,
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER,
+  },
+  eyebrow: {
+    color: ACCENT,
+    fontSize: 12,
+    letterSpacing: 3,
+    marginBottom: 6,
+    fontWeight: "500",
   },
   headerTitle: {
-    color: "#fff",
-    fontSize: 28,
-    fontWeight: "900",
-    letterSpacing: 2,
+    color: TEXT,
+    fontSize: 42,
+    fontWeight: "300",
+    letterSpacing: -1,
+  },
+  accentLine: {
+    height: 2,
+    width: 40,
+    backgroundColor: ACCENT,
+    marginTop: 14,
+    marginBottom: 14,
   },
   headerSubtitle: {
-    color: ACCENT,
-    fontSize: 14,
-    marginTop: 4,
-    fontStyle: "italic",
+    color: TEXT_DIM,
+    fontSize: 13,
+    letterSpacing: 0.5,
   },
   container: {
     flex: 1,
-    backgroundColor: PRIMARY,
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 30,
-    paddingBottom: 40,
+    paddingHorizontal: 24,
+    paddingTop: 28,
+    paddingBottom: 60,
+    backgroundColor: BG,
   },
   inputContainer: {
     width: "100%",
-    marginBottom: 16,
+    marginBottom: 18,
   },
   label: {
-    color: "#fff",
-    fontSize: 14,
+    color: TEXT_MUTED,
+    fontSize: 11,
     fontWeight: "600",
     marginBottom: 8,
-    textTransform: "uppercase",
-    letterSpacing: 1,
+    letterSpacing: 2,
   },
   input: {
     width: "100%",
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 14,
-    fontSize: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: SURFACE,
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    fontSize: 15,
+    color: TEXT,
   },
   button: {
-    backgroundColor: PRIMARY_DARK,
-    borderRadius: 12,
-    paddingHorizontal: 40,
+    backgroundColor: "transparent",
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: ACCENT,
+    paddingHorizontal: 24,
     paddingVertical: 14,
-    marginBottom: 16,
+    marginBottom: 18,
     width: "100%",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 5,
   },
   buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "700",
-    letterSpacing: 1,
-    textTransform: "uppercase",
+    color: ACCENT,
+    fontSize: 13,
+    fontWeight: "500",
+    letterSpacing: 2,
   },
   errorBox: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 12,
+    backgroundColor: ACCENT_SOFT,
+    borderLeftWidth: 2,
+    borderLeftColor: ACCENT,
+    borderRadius: 2,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginBottom: 14,
     width: "100%",
+    flexDirection: "row",
     alignItems: "center",
+    gap: 10,
+  },
+  errorGlyph: {
+    color: ACCENT,
+    fontSize: 14,
+    fontWeight: "700",
   },
   error: {
-    color: "#e74c3c",
-    fontSize: 14,
-    fontWeight: "600",
+    color: TEXT,
+    fontSize: 13,
+    fontWeight: "400",
   },
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
+    backgroundColor: SURFACE,
+    borderRadius: 4,
     width: "100%",
     marginBottom: 16,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 8,
+    padding: 18,
+    borderLeftWidth: 2,
+    borderLeftColor: ACCENT,
+    borderTopWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderTopColor: BORDER,
+    borderRightColor: BORDER,
+    borderBottomColor: BORDER,
   },
-  cardHeader: {
-    backgroundColor: PRIMARY_DARK,
-    padding: 16,
+  cardTop: {
+    flexDirection: "row",
     alignItems: "center",
+    gap: 10,
+    marginBottom: 10,
+  },
+  cardTag: {
+    color: ACCENT,
+    fontSize: 11,
+    letterSpacing: 2.5,
+    fontWeight: "500",
+  },
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: ACCENT,
+  },
+  cardLabel: {
+    color: TEXT_MUTED,
+    fontSize: 11,
+    letterSpacing: 2,
   },
   cardTitle: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "800",
-    letterSpacing: 1,
+    color: TEXT,
+    fontSize: 26,
+    fontWeight: "300",
+    letterSpacing: -0.5,
   },
-  cardBody: {
-    padding: 16,
+  divider: {
+    height: 1,
+    width: "100%",
+    backgroundColor: BORDER,
+    marginVertical: 14,
   },
-  infoRow: {
-    marginBottom: 12,
-  },
+  infoRow: { marginBottom: 12 },
   infoLabel: {
-    color: PRIMARY_DARK,
-    fontSize: 11,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 1,
+    color: TEXT_MUTED,
+    fontSize: 10,
+    fontWeight: "600",
+    letterSpacing: 2,
     marginBottom: 4,
   },
   infoValue: {
-    color: "#333",
-    fontSize: 14,
+    color: TEXT,
+    fontSize: 13,
     lineHeight: 20,
+    fontWeight: "300",
   },
   imagesButton: {
-    backgroundColor: PRIMARY,
-    padding: 14,
+    backgroundColor: "transparent",
+    borderTopWidth: 1,
+    borderTopColor: BORDER,
+    paddingTop: 14,
+    marginTop: 6,
     alignItems: "center",
   },
   imagesButtonText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "700",
-    letterSpacing: 0.5,
+    color: ACCENT,
+    fontSize: 12,
+    fontWeight: "500",
+    letterSpacing: 1.5,
   },
   sectionTitle: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "700",
-    marginTop: 8,
-    marginBottom: 12,
-    textTransform: "uppercase",
-    letterSpacing: 1,
+    color: TEXT_DIM,
+    fontSize: 12,
+    fontWeight: "500",
+    marginTop: 12,
+    marginBottom: 14,
+    letterSpacing: 2,
     alignSelf: "flex-start",
   },
   listContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     width: "100%",
-    justifyContent: "flex-start",
     gap: 8,
   },
   listItem: {
-    backgroundColor: "#fff",
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: BORDER,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 2,
   },
   listItemText: {
-    color: PRIMARY_DARK,
+    color: TEXT_DIM,
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "400",
+    letterSpacing: 0.5,
   },
 });
