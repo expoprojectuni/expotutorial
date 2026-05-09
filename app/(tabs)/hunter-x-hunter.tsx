@@ -3,7 +3,7 @@ import { Personaje, useAnime } from "@/context/AnimeContext";
 import { useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
-const API_URL = "https://pokedex-backend-production-cd5c.up.railway.app/api";
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://pokedex-backend-production-cd5c.up.railway.app/api";
 const PRIMARY = "#228B22";
 const PRIMARY_DARK = "#1A6B1A";
 const ACCENT = "#90EE90";
