@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useRouter } from "expo-router";
 import { useAnime } from "@/context/AnimeContext";
+import { useAuth } from "@/context/AuthContext";
+import { useCategories } from "@/context/CategoriesContext";
 import ModalImagenes from "@/components/ModalImagenes";
 
 const BG = "#0A0E1A";
@@ -16,54 +19,168 @@ const PIRATE = "#3DDDFF";
 
 export default function ResumenScreen() {
   const { personajes } = useAnime();
+  const { categorias } = useCategories();
+  const { user, logout } = useAuth();
+  const router = useRouter();
   const [mostrarModal, setMostrarModal] = useState(false);
 
   const saints = personajes["saint-seiya"];
   const hunters = personajes["hunter-x-hunter"];
   const pirates = personajes["one-piece"];
 
-  const todosPersonajes = [saints, hunters, pirates].filter(Boolean);
-  const todasImagenes = todosPersonajes.flatMap((p) => (p ? p.imagenes : []));
+  const cerrarSesion = () => {
+    logout();
+    router.replace("/login");
+  };
+
+  const totalConsultas = saints.length + hunters.length + pirates.length;
+  const todasImagenes = [
+    ...saints.flatMap((p) => p.imagenes),
+    ...hunters.flatMap((p) => p.imagenes),
+    ...pirates.flatMap((p) => p.imagenes),
+  ];
+
+  const totalAnimes = categorias.reduce((acc, c) => acc + c.animes.length, 0);
+  const todasImagenesUsuario = categorias.flatMap((c) =>
+    c.animes.flatMap((a) => a.imagenes)
+  );
+  const galeriaCompleta = [...todasImagenes, ...todasImagenesUsuario];
+  const sinContenido = totalConsultas === 0 && categorias.length === 0;
 
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>{"// dashboard"}</Text>
+        <View style={styles.headerTopRow}>
+          <Text style={styles.eyebrow}>{"// dashboard"}</Text>
+          {user && (
+            <View style={styles.userBadge}>
+              <View style={styles.userDot} />
+              <Text style={styles.userBadgeText}>{user.displayName}</Text>
+            </View>
+          )}
+        </View>
         <Text style={styles.headerTitle}>resumen</Text>
         <View style={styles.accentLine} />
         <Text style={styles.headerSubtitle}>personajes consultados en sesión</Text>
       </View>
 
       <View style={styles.container}>
-        {todosPersonajes.length === 0 ? (
+        {sinContenido ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyGlyph}>◇</Text>
-            <Text style={styles.emptyText}>sin consultas todavía</Text>
-            <Text style={styles.emptyHint}>navega a las pestañas para buscar personajes</Text>
+            <Text style={styles.emptyText}>sin contenido todavía</Text>
+            <Text style={styles.emptyHint}>busca personajes o crea categorías propias</Text>
           </View>
         ) : (
           <>
             <View style={styles.statsRow}>
-              <StatPill label="series" value={String(todosPersonajes.length)} />
-              <StatPill label="imágenes" value={String(todasImagenes.length)} />
+              <StatPill label="consultas" value={String(totalConsultas)} />
+              <StatPill label="categorías" value={String(categorias.length)} />
+              <StatPill label="animes" value={String(totalAnimes)} />
             </View>
 
-            {saints && <PersonajeCard data={saints} accent={SAINT} label="saint seiya" tag="01" />}
-            {hunters && <PersonajeCard data={hunters} accent={HUNTER} label="hunter x hunter" tag="02" />}
-            {pirates && <PersonajeCard data={pirates} accent={PIRATE} label="one piece" tag="03" />}
+            {totalConsultas > 0 && (
+              <>
+                <Text style={styles.sectionTitle}>{"› personajes consultados"}</Text>
+                {saints.map((p) => (
+                  <PersonajeCard
+                    key={`saint-${p.id}`}
+                    data={p}
+                    accent={SAINT}
+                    label="saint seiya"
+                    tag="01"
+                  />
+                ))}
+                {hunters.map((p) => (
+                  <PersonajeCard
+                    key={`hunter-${p.id}`}
+                    data={p}
+                    accent={HUNTER}
+                    label="hunter x hunter"
+                    tag="02"
+                  />
+                ))}
+                {pirates.map((p) => (
+                  <PersonajeCard
+                    key={`pirate-${p.id}`}
+                    data={p}
+                    accent={PIRATE}
+                    label="one piece"
+                    tag="03"
+                  />
+                ))}
+              </>
+            )}
 
-            {todasImagenes.length > 0 && (
+            {categorias.length > 0 && (
+              <>
+                <Text style={styles.sectionTitle}>{"› mis categorías"}</Text>
+                {categorias.map((c, i) => (
+                  <View key={c.id} style={styles.categoriaCard}>
+                    <View style={styles.categoriaTop}>
+                      <Text style={styles.categoriaTag}>{String(i + 1).padStart(2, "0")}</Text>
+                      <Text style={styles.categoriaLabel}>categoría</Text>
+                      <View style={styles.categoriaDot} />
+                      <Text style={styles.categoriaCount}>{c.animes.length} animes</Text>
+                    </View>
+                    <Pressable onPress={() => router.push(`/categoria/${c.id}`)}>
+                      <Text style={styles.categoriaName}>{c.nombre.toLowerCase()}</Text>
+                    </Pressable>
+                    {c.descripcion !== "" && (
+                      <Text style={styles.categoriaDescription}>{c.descripcion}</Text>
+                    )}
+
+                    {c.animes.length > 0 && (
+                      <View style={styles.animesList}>
+                        {c.animes.map((a) => (
+                          <Pressable
+                            key={a.id}
+                            style={styles.animeRow}
+                            onPress={() => router.push(`/anime/${c.id}/${a.id}`)}
+                          >
+                            {a.imagenes[0] ? (
+                              <Image source={{ uri: a.imagenes[0] }} style={styles.animeThumb} />
+                            ) : (
+                              <View style={[styles.animeThumb, styles.animeThumbEmpty]}>
+                                <Text style={styles.animeThumbGlyph}>◆</Text>
+                              </View>
+                            )}
+                            <View style={styles.animeInfo}>
+                              <Text style={styles.animeTitle} numberOfLines={1}>
+                                {a.titulo.toLowerCase()}
+                              </Text>
+                              <Text style={styles.animeMeta} numberOfLines={1}>
+                                {[a.genero, a.episodios && `${a.episodios} ep`, `${a.imagenes.length} img`]
+                                  .filter(Boolean)
+                                  .join(" · ")}
+                              </Text>
+                            </View>
+                            <Text style={styles.animeArrow}>›</Text>
+                          </Pressable>
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                ))}
+              </>
+            )}
+
+            {galeriaCompleta.length > 0 && (
               <Pressable style={styles.imagesButton} onPress={() => setMostrarModal(true)}>
                 <Text style={styles.imagesButtonText}>▸ ver galería completa</Text>
-                <Text style={styles.imagesButtonCount}>{todasImagenes.length}</Text>
+                <Text style={styles.imagesButtonCount}>{galeriaCompleta.length}</Text>
               </Pressable>
             )}
           </>
         )}
 
+        <Pressable style={styles.logoutButton} onPress={cerrarSesion}>
+          <Text style={styles.logoutButtonText}>▸ cerrar sesión</Text>
+        </Pressable>
+
         <ModalImagenes
           visible={mostrarModal}
-          imagenes={todasImagenes}
+          imagenes={galeriaCompleta}
           onClose={() => setMostrarModal(false)}
         />
       </View>
@@ -130,6 +247,50 @@ const styles = StyleSheet.create({
     backgroundColor: BG,
     borderBottomWidth: 1,
     borderBottomColor: BORDER,
+  },
+  headerTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  userBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 2,
+    backgroundColor: SURFACE,
+  },
+  userDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: NEON_PURPLE,
+  },
+  userBadgeText: {
+    color: TEXT,
+    fontSize: 11,
+    letterSpacing: 1.5,
+    fontWeight: "500",
+  },
+  logoutButton: {
+    marginTop: 18,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 4,
+    alignItems: "center",
+  },
+  logoutButtonText: {
+    color: TEXT_DIM,
+    fontSize: 12,
+    fontWeight: "500",
+    letterSpacing: 2,
   },
   eyebrow: {
     color: NEON_PURPLE,
@@ -293,5 +454,119 @@ const styles = StyleSheet.create({
     color: NEON_PURPLE,
     fontSize: 14,
     fontWeight: "700",
+  },
+  sectionTitle: {
+    color: TEXT_DIM,
+    fontSize: 12,
+    fontWeight: "500",
+    marginTop: 8,
+    marginBottom: 12,
+    letterSpacing: 2,
+  },
+  categoriaCard: {
+    backgroundColor: SURFACE,
+    borderRadius: 4,
+    width: "100%",
+    marginBottom: 14,
+    padding: 18,
+    borderLeftWidth: 2,
+    borderLeftColor: NEON_PURPLE,
+    borderTopWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderTopColor: BORDER,
+    borderRightColor: BORDER,
+    borderBottomColor: BORDER,
+  },
+  categoriaTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 8,
+  },
+  categoriaTag: {
+    color: NEON_PURPLE,
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1,
+  },
+  categoriaLabel: {
+    color: NEON_PURPLE,
+    fontSize: 11,
+    letterSpacing: 2.5,
+    fontWeight: "500",
+  },
+  categoriaDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: TEXT_MUTED,
+  },
+  categoriaCount: {
+    color: TEXT_MUTED,
+    fontSize: 11,
+    letterSpacing: 1,
+  },
+  categoriaName: {
+    fontSize: 22,
+    fontWeight: "300",
+    color: TEXT,
+    letterSpacing: -0.5,
+  },
+  categoriaDescription: {
+    color: TEXT_DIM,
+    fontSize: 13,
+    marginTop: 6,
+    lineHeight: 19,
+    fontWeight: "300",
+  },
+  animesList: {
+    marginTop: 14,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: BORDER,
+    gap: 8,
+  },
+  animeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 6,
+  },
+  animeThumb: {
+    width: 44,
+    height: 44,
+    borderRadius: 2,
+    backgroundColor: "#1B2238",
+  },
+  animeThumbEmpty: {
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+  animeThumbGlyph: {
+    color: NEON_PURPLE,
+    fontSize: 14,
+  },
+  animeInfo: {
+    flex: 1,
+  },
+  animeTitle: {
+    color: TEXT,
+    fontSize: 14,
+    fontWeight: "400",
+    letterSpacing: 0.3,
+  },
+  animeMeta: {
+    color: TEXT_MUTED,
+    fontSize: 11,
+    letterSpacing: 0.5,
+    marginTop: 2,
+  },
+  animeArrow: {
+    color: TEXT_DIM,
+    fontSize: 20,
+    fontWeight: "300",
   },
 });

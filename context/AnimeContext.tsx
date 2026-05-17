@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
+import { useAuth } from "./AuthContext";
 
 export interface Personaje {
   id: number;
@@ -9,32 +10,69 @@ export interface Personaje {
   imagenes: string[];
 }
 
+type AnimeKey = "saint-seiya" | "hunter-x-hunter" | "one-piece";
+
+type PersonajesPorAnime = Record<AnimeKey, Personaje[]>;
+
+const EMPTY: PersonajesPorAnime = {
+  "saint-seiya": [],
+  "hunter-x-hunter": [],
+  "one-piece": [],
+};
+
 interface AnimeContextType {
-  personajes: Record<string, Personaje | null>;
-  setPersonaje: (anime: string, personaje: Personaje) => void;
+  personajes: PersonajesPorAnime;
+  agregarPersonaje: (anime: string, personaje: Personaje) => void;
+  eliminarPersonaje: (anime: string, personajeId: number) => void;
 }
 
 const AnimeContext = createContext<AnimeContextType>({
-  personajes: { "saint-seiya": null, "hunter-x-hunter": null, "one-piece": null },
-  setPersonaje: () => {},
+  personajes: EMPTY,
+  agregarPersonaje: () => {},
+  eliminarPersonaje: () => {},
 });
 
 export function AnimeProvider({ children }: { children: React.ReactNode }) {
-  const [personajes, setPersonajesState] = useState<Record<string, Personaje | null>>({
-    "saint-seiya": null,
-    "hunter-x-hunter": null,
-    "one-piece": null,
-  });
+  const { user } = useAuth();
+  const [porUsuario, setPorUsuario] = useState<Record<string, PersonajesPorAnime>>({});
 
-  const setPersonaje = (anime: string, personaje: Personaje) => {
-    setPersonajesState((prev) => ({ ...prev, [anime]: personaje }));
-  };
+  const userId = user?.id ?? "__anon__";
+  const personajes = porUsuario[userId] ?? EMPTY;
 
-  return (
-    <AnimeContext.Provider value={{ personajes, setPersonaje }}>
-      {children}
-    </AnimeContext.Provider>
+  const value = useMemo<AnimeContextType>(
+    () => ({
+      personajes,
+      agregarPersonaje: (anime, personaje) => {
+        setPorUsuario((prev) => {
+          const actual = prev[userId] ?? EMPTY;
+          const key = anime as AnimeKey;
+          const listaPrevia = actual[key] ?? [];
+          const sinDuplicado = listaPrevia.filter((p) => p.id !== personaje.id);
+          return {
+            ...prev,
+            [userId]: { ...actual, [key]: [...sinDuplicado, personaje] },
+          };
+        });
+      },
+      eliminarPersonaje: (anime, personajeId) => {
+        setPorUsuario((prev) => {
+          const actual = prev[userId] ?? EMPTY;
+          const key = anime as AnimeKey;
+          const listaPrevia = actual[key] ?? [];
+          return {
+            ...prev,
+            [userId]: {
+              ...actual,
+              [key]: listaPrevia.filter((p) => p.id !== personajeId),
+            },
+          };
+        });
+      },
+    }),
+    [personajes, userId]
   );
+
+  return <AnimeContext.Provider value={value}>{children}</AnimeContext.Provider>;
 }
 
 export function useAnime() {

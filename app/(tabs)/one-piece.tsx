@@ -1,9 +1,10 @@
+import LogoutButton from "@/components/LogoutButton";
 import ModalImagenes from "@/components/ModalImagenes";
 import { Personaje, useAnime } from "@/context/AnimeContext";
 import { useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://pokedex-backend-production-cd5c.up.railway.app/api";
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://new-back-animes.onrender.com/api";
 
 const BG = "#0A0E1A";
 const SURFACE = "#141A2E";
@@ -21,23 +22,23 @@ const PERSONAJES_DISPONIBLES = [
 
 export default function OnePieceScreen() {
   const [nombre, setNombre] = useState("");
-  const { personajes, setPersonaje } = useAnime();
+  const { personajes, agregarPersonaje, eliminarPersonaje } = useAnime();
   const [error, setError] = useState("");
   const [mostrarModal, setMostrarModal] = useState(false);
   const [imagenesModal, setImagenesModal] = useState<string[]>([]);
 
   const anime = "one-piece";
-  const personaje = personajes[anime];
+  const lista = personajes[anime];
 
   const consultarPersonaje = async () => {
     if (!nombre.trim()) return;
     setError("");
     setMostrarModal(false);
     try {
-      const res = await fetch(`${API_URL}/${anime}/${nombre.toLowerCase().trim()}`);
+      const res = await fetch(`${API_URL}/${anime}/${encodeURIComponent(nombre.toLowerCase().trim())}`);
       if (!res.ok) throw new Error("Personaje no encontrado");
       const data: Personaje = await res.json();
-      setPersonaje(anime, data);
+      agregarPersonaje(anime, data);
       setImagenesModal(data.imagenes);
       Alert.alert(
         data.nombre.toUpperCase(),
@@ -62,7 +63,10 @@ export default function OnePieceScreen() {
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>{"// serie 03"}</Text>
+        <View style={styles.headerTopRow}>
+          <Text style={styles.eyebrow}>{"// serie 03"}</Text>
+          <LogoutButton />
+        </View>
         <Text style={styles.headerTitle}>one piece</Text>
         <View style={styles.accentLine} />
         <Text style={styles.headerSubtitle}>el tesoro más grande</Text>
@@ -91,37 +95,66 @@ export default function OnePieceScreen() {
           </View>
         )}
 
-        {personaje && (
-          <View style={styles.card}>
-            <View style={styles.cardTop}>
-              <Text style={styles.cardTag}>resultado</Text>
-              <View style={styles.dot} />
-              <Text style={styles.cardLabel}>activo</Text>
-            </View>
-            <Text style={styles.cardTitle}>{personaje.nombre.toLowerCase()}</Text>
-            <View style={styles.divider} />
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>descripción</Text>
-              <Text style={styles.infoValue}>{personaje.descripcion}</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>habilidades</Text>
-              <Text style={styles.infoValue}>{personaje.habilidades}</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>imágenes</Text>
-              <Text style={[styles.infoValue, { color: ACCENT }]}>{personaje.imagenes.length} recuperadas</Text>
-            </View>
+        {lista.length > 0 && (
+          <>
+            <Text style={styles.sectionTitle}>
+              {"› consultados "}
+              <Text style={styles.sectionCount}>({lista.length})</Text>
+            </Text>
+            {lista
+              .slice()
+              .reverse()
+              .map((personaje, idx) => (
+                <View key={personaje.id} style={styles.card}>
+                  <View style={styles.cardTop}>
+                    <Text style={styles.cardTag}>
+                      {String(lista.length - idx).padStart(2, "0")}
+                    </Text>
+                    <View style={styles.dot} />
+                    <Text style={styles.cardLabel}>
+                      {idx === 0 ? "último" : "consulta"}
+                    </Text>
+                    <Pressable
+                      hitSlop={8}
+                      style={styles.cardRemove}
+                      onPress={() => eliminarPersonaje(anime, personaje.id)}
+                    >
+                      <Text style={styles.cardRemoveText}>quitar</Text>
+                    </Pressable>
+                  </View>
+                  <Text style={styles.cardTitle}>{personaje.nombre.toLowerCase()}</Text>
+                  <View style={styles.divider} />
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>descripción</Text>
+                    <Text style={styles.infoValue}>{personaje.descripcion}</Text>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>habilidades</Text>
+                    <Text style={styles.infoValue}>{personaje.habilidades}</Text>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>imágenes</Text>
+                    <Text style={[styles.infoValue, { color: ACCENT }]}>
+                      {personaje.imagenes.length} recuperadas
+                    </Text>
+                  </View>
 
-            {personaje.imagenes.length > 0 && (
-              <Pressable
-                style={styles.imagesButton}
-                onPress={() => { setImagenesModal(personaje.imagenes); setMostrarModal(true); }}
-              >
-                <Text style={styles.imagesButtonText}>ver imágenes ({personaje.imagenes.length})</Text>
-              </Pressable>
-            )}
-          </View>
+                  {personaje.imagenes.length > 0 && (
+                    <Pressable
+                      style={styles.imagesButton}
+                      onPress={() => {
+                        setImagenesModal(personaje.imagenes);
+                        setMostrarModal(true);
+                      }}
+                    >
+                      <Text style={styles.imagesButtonText}>
+                        ver imágenes ({personaje.imagenes.length})
+                      </Text>
+                    </Pressable>
+                  )}
+                </View>
+              ))}
+          </>
         )}
 
         <ModalImagenes
@@ -157,6 +190,12 @@ const styles = StyleSheet.create({
     backgroundColor: BG,
     borderBottomWidth: 1,
     borderBottomColor: BORDER,
+  },
+  headerTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 6,
   },
   eyebrow: {
     color: ACCENT,
@@ -328,6 +367,26 @@ const styles = StyleSheet.create({
     color: ACCENT,
     fontSize: 12,
     fontWeight: "500",
+    letterSpacing: 1.5,
+  },
+  sectionCount: {
+    color: ACCENT,
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 1.5,
+  },
+  cardRemove: {
+    marginLeft: "auto",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 2,
+  },
+  cardRemoveText: {
+    color: TEXT_MUTED,
+    fontSize: 10,
+    fontWeight: "600",
     letterSpacing: 1.5,
   },
   sectionTitle: {

@@ -1,0 +1,263 @@
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+
+const BG = "#0A0E1A";
+const SURFACE = "#141A2E";
+const BORDER = "#2A3458";
+const TEXT = "#E8EAF6";
+const TEXT_DIM = "#8A93B8";
+const TEXT_MUTED = "#5A6285";
+const NEON_PURPLE = "#B14EFF";
+const ACCENT_SOFT = "#FF2E9322";
+const ERROR = "#FF2E93";
+
+const USUARIOS_HINT = [
+  { user: "admin", pass: "admin" },
+  { user: "daniel", pass: "1234" },
+  { user: "otaku", pass: "anime" },
+];
+
+export default function LoginScreen() {
+  const router = useRouter();
+  const { login } = useAuth();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const intentarLogin = () => {
+    if (!username.trim() || !password) {
+      setError("ingresa usuario y contraseña");
+      return;
+    }
+    const result = login(username, password);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setError("");
+    setPassword("");
+    router.replace("/(tabs)/saint-seiya");
+  };
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.header}>
+          <Text style={styles.eyebrow}>{"// access"}</Text>
+          <Text style={styles.headerTitle}>login</Text>
+          <View style={styles.accentLine} />
+          <Text style={styles.headerSubtitle}>inicia sesión para consultar personajes</Text>
+        </View>
+
+        <View style={styles.container}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>usuario</Text>
+            <TextInput
+              style={styles.input}
+              value={username}
+              onChangeText={setUsername}
+              placeholder="ej: admin"
+              placeholderTextColor={TEXT_MUTED}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>contraseña</Text>
+            <TextInput
+              style={styles.input}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="••••••"
+              placeholderTextColor={TEXT_MUTED}
+              secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
+
+          <Pressable style={styles.button} onPress={intentarLogin}>
+            <Text style={styles.buttonText}>▸ ingresar</Text>
+          </Pressable>
+
+          {error !== "" && (
+            <View style={styles.errorBox}>
+              <Text style={styles.errorGlyph}>!</Text>
+              <Text style={styles.error}>{error}</Text>
+            </View>
+          )}
+
+          <Text style={styles.sectionTitle}>{"› credenciales de prueba"}</Text>
+          <View style={styles.hintBox}>
+            {USUARIOS_HINT.map((u) => (
+              <Pressable
+                key={u.user}
+                style={styles.hintRow}
+                onPress={() => {
+                  setUsername(u.user);
+                  setPassword(u.pass);
+                  setError("");
+                }}
+              >
+                <Text style={styles.hintLabel}>{u.user}</Text>
+                <Text style={styles.hintValue}>{u.pass}</Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  flex: { flex: 1, backgroundColor: BG },
+  scroll: { backgroundColor: BG },
+  scrollContent: { flexGrow: 1, backgroundColor: BG },
+  header: {
+    paddingTop: 90,
+    paddingBottom: 32,
+    paddingHorizontal: 24,
+    backgroundColor: BG,
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER,
+  },
+  eyebrow: {
+    color: NEON_PURPLE,
+    fontSize: 12,
+    letterSpacing: 3,
+    marginBottom: 6,
+    fontWeight: "500",
+  },
+  headerTitle: {
+    color: TEXT,
+    fontSize: 42,
+    fontWeight: "300",
+    letterSpacing: -1,
+  },
+  accentLine: {
+    height: 2,
+    width: 40,
+    backgroundColor: NEON_PURPLE,
+    marginTop: 14,
+    marginBottom: 14,
+  },
+  headerSubtitle: {
+    color: TEXT_DIM,
+    fontSize: 13,
+    letterSpacing: 0.5,
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    paddingBottom: 60,
+    backgroundColor: BG,
+  },
+  inputContainer: { width: "100%", marginBottom: 18 },
+  label: {
+    color: TEXT_MUTED,
+    fontSize: 11,
+    fontWeight: "600",
+    marginBottom: 8,
+    letterSpacing: 2,
+  },
+  input: {
+    width: "100%",
+    backgroundColor: SURFACE,
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    fontSize: 15,
+    color: TEXT,
+  },
+  button: {
+    backgroundColor: "transparent",
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: NEON_PURPLE,
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    marginBottom: 18,
+    width: "100%",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: NEON_PURPLE,
+    fontSize: 13,
+    fontWeight: "500",
+    letterSpacing: 2,
+  },
+  errorBox: {
+    backgroundColor: ACCENT_SOFT,
+    borderLeftWidth: 2,
+    borderLeftColor: ERROR,
+    borderRadius: 2,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginBottom: 14,
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  errorGlyph: { color: ERROR, fontSize: 14, fontWeight: "700" },
+  error: { color: TEXT, fontSize: 13, fontWeight: "400" },
+  sectionTitle: {
+    color: TEXT_DIM,
+    fontSize: 12,
+    fontWeight: "500",
+    marginTop: 18,
+    marginBottom: 12,
+    letterSpacing: 2,
+  },
+  hintBox: {
+    backgroundColor: SURFACE,
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 4,
+    paddingVertical: 4,
+  },
+  hintRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER,
+  },
+  hintLabel: {
+    color: TEXT,
+    fontSize: 13,
+    fontWeight: "400",
+    letterSpacing: 1,
+  },
+  hintValue: {
+    color: NEON_PURPLE,
+    fontSize: 12,
+    fontWeight: "500",
+    letterSpacing: 1.5,
+  },
+});
