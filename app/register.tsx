@@ -22,31 +22,32 @@ const NEON_PURPLE = "#B14EFF";
 const ACCENT_SOFT = "#FF2E9322";
 const ERROR = "#FF2E93";
 
-const USUARIOS_HINT = [
-  { user: "admin", pass: "admin" },
-  { user: "daniel", pass: "1234" },
-  { user: "otaku", pass: "anime" },
-];
-
-export default function LoginScreen() {
+export default function RegisterScreen() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { register } = useAuth();
   const [username, setUsername] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
 
-  const intentarLogin = () => {
+  const intentarRegistro = () => {
     if (!username.trim() || !password) {
       setError("ingresa usuario y contraseña");
       return;
     }
-    const result = login(username, password);
+    if (password !== confirm) {
+      setError("las contraseñas no coinciden");
+      return;
+    }
+    const result = register(username, password, displayName);
     if (!result.ok) {
       setError(result.error);
       return;
     }
     setError("");
     setPassword("");
+    setConfirm("");
     router.replace("/(tabs)/saint-seiya");
   };
 
@@ -61,10 +62,10 @@ export default function LoginScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>{"// access"}</Text>
-          <Text style={styles.headerTitle}>login</Text>
+          <Text style={styles.eyebrow}>{"// new user"}</Text>
+          <Text style={styles.headerTitle}>crear cuenta</Text>
           <View style={styles.accentLine} />
-          <Text style={styles.headerSubtitle}>inicia sesión para consultar personajes</Text>
+          <Text style={styles.headerSubtitle}>regístrate para guardar tus categorías</Text>
         </View>
 
         <View style={styles.container}>
@@ -74,7 +75,20 @@ export default function LoginScreen() {
               style={styles.input}
               value={username}
               onChangeText={setUsername}
-              placeholder="ej: admin"
+              placeholder="mínimo 3 caracteres"
+              placeholderTextColor={TEXT_MUTED}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>nombre visible (opcional)</Text>
+            <TextInput
+              style={styles.input}
+              value={displayName}
+              onChangeText={setDisplayName}
+              placeholder="cómo quieres que te llamen"
               placeholderTextColor={TEXT_MUTED}
               autoCapitalize="none"
               autoCorrect={false}
@@ -87,7 +101,7 @@ export default function LoginScreen() {
               style={styles.input}
               value={password}
               onChangeText={setPassword}
-              placeholder="••••••"
+              placeholder="mínimo 4 caracteres"
               placeholderTextColor={TEXT_MUTED}
               secureTextEntry
               autoCapitalize="none"
@@ -95,8 +109,22 @@ export default function LoginScreen() {
             />
           </View>
 
-          <Pressable style={styles.button} onPress={intentarLogin}>
-            <Text style={styles.buttonText}>▸ ingresar</Text>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>confirmar contraseña</Text>
+            <TextInput
+              style={styles.input}
+              value={confirm}
+              onChangeText={setConfirm}
+              placeholder="repite la contraseña"
+              placeholderTextColor={TEXT_MUTED}
+              secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
+
+          <Pressable style={styles.button} onPress={intentarRegistro}>
+            <Text style={styles.buttonText}>▸ crear cuenta</Text>
           </Pressable>
 
           {error !== "" && (
@@ -106,29 +134,11 @@ export default function LoginScreen() {
             </View>
           )}
 
-          <View style={styles.registerRow}>
-            <Text style={styles.registerText}>¿no tienes cuenta?</Text>
-            <Link href="/register" replace style={styles.registerLink}>
-              crear una
+          <View style={styles.footerRow}>
+            <Text style={styles.footerText}>¿ya tienes cuenta?</Text>
+            <Link href="/login" replace style={styles.footerLink}>
+              iniciar sesión
             </Link>
-          </View>
-
-          <Text style={styles.sectionTitle}>{"› credenciales de prueba"}</Text>
-          <View style={styles.hintBox}>
-            {USUARIOS_HINT.map((u) => (
-              <Pressable
-                key={u.user}
-                style={styles.hintRow}
-                onPress={() => {
-                  setUsername(u.user);
-                  setPassword(u.pass);
-                  setError("");
-                }}
-              >
-                <Text style={styles.hintLabel}>{u.user}</Text>
-                <Text style={styles.hintValue}>{u.pass}</Text>
-              </Pressable>
-            ))}
           </View>
         </View>
       </ScrollView>
@@ -231,55 +241,18 @@ const styles = StyleSheet.create({
   },
   errorGlyph: { color: ERROR, fontSize: 14, fontWeight: "700" },
   error: { color: TEXT, fontSize: 13, fontWeight: "400" },
-  sectionTitle: {
-    color: TEXT_DIM,
-    fontSize: 12,
-    fontWeight: "500",
+  footerRow: {
     marginTop: 18,
-    marginBottom: 12,
-    letterSpacing: 2,
-  },
-  hintBox: {
-    backgroundColor: SURFACE,
-    borderWidth: 1,
-    borderColor: BORDER,
-    borderRadius: 4,
-    paddingVertical: 4,
-  },
-  hintRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: BORDER,
-  },
-  hintLabel: {
-    color: TEXT,
-    fontSize: 13,
-    fontWeight: "400",
-    letterSpacing: 1,
-  },
-  hintValue: {
-    color: NEON_PURPLE,
-    fontSize: 12,
-    fontWeight: "500",
-    letterSpacing: 1.5,
-  },
-  registerRow: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     gap: 8,
-    marginTop: 4,
-    marginBottom: 4,
   },
-  registerText: {
+  footerText: {
     color: TEXT_DIM,
     fontSize: 13,
   },
-  registerLink: {
+  footerLink: {
     color: NEON_PURPLE,
     fontSize: 13,
     fontWeight: "600",

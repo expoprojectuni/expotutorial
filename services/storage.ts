@@ -28,5 +28,6 @@ export async function borrar(clave: string): Promise<void> {
 
 export const STORAGE_KEYS = {
   user: "@anime/user",
+  usuarios: "@anime/usuarios",
   categorias: (userId: string) => `@anime/categorias/${userId}`,
 };
