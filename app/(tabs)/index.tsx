@@ -1,10 +1,17 @@
-import { useState } from "react";
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useRouter } from "expo-router";
+import ModalImagenes from "@/components/ModalImagenes";
 import { useAnime } from "@/context/AnimeContext";
 import { useAuth } from "@/context/AuthContext";
 import { useCategories } from "@/context/CategoriesContext";
-import ModalImagenes from "@/components/ModalImagenes";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 const BG = "#0A0E1A";
 const SURFACE = "#141A2E";
@@ -42,13 +49,16 @@ export default function ResumenScreen() {
 
   const totalAnimes = categorias.reduce((acc, c) => acc + c.animes.length, 0);
   const todasImagenesUsuario = categorias.flatMap((c) =>
-    c.animes.flatMap((a) => a.imagenes)
+    c.animes.flatMap((a) => a.imagenes),
   );
   const galeriaCompleta = [...todasImagenes, ...todasImagenesUsuario];
   const sinContenido = totalConsultas === 0 && categorias.length === 0;
 
   return (
-    <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.scrollContent}
+    >
       <View style={styles.header}>
         <View style={styles.headerTopRow}>
           <Text style={styles.eyebrow}>{"// dashboard"}</Text>
@@ -61,7 +71,9 @@ export default function ResumenScreen() {
         </View>
         <Text style={styles.headerTitle}>resumen</Text>
         <View style={styles.accentLine} />
-        <Text style={styles.headerSubtitle}>personajes consultados en sesión</Text>
+        <Text style={styles.headerSubtitle}>
+          personajes consultados en sesión
+        </Text>
       </View>
 
       <View style={styles.container}>
@@ -69,7 +81,9 @@ export default function ResumenScreen() {
           <View style={styles.emptyState}>
             <Text style={styles.emptyGlyph}>◇</Text>
             <Text style={styles.emptyText}>sin contenido todavía</Text>
-            <Text style={styles.emptyHint}>busca personajes o crea categorías propias</Text>
+            <Text style={styles.emptyHint}>
+              busca personajes o crea categorías propias
+            </Text>
           </View>
         ) : (
           <>
@@ -81,7 +95,9 @@ export default function ResumenScreen() {
 
             {totalConsultas > 0 && (
               <>
-                <Text style={styles.sectionTitle}>{"› personajes consultados"}</Text>
+                <Text style={styles.sectionTitle}>
+                  {"› personajes consultados"}
+                </Text>
                 {saints.map((p) => (
                   <PersonajeCard
                     key={`saint-${p.id}`}
@@ -118,16 +134,26 @@ export default function ResumenScreen() {
                 {categorias.map((c, i) => (
                   <View key={c.id} style={styles.categoriaCard}>
                     <View style={styles.categoriaTop}>
-                      <Text style={styles.categoriaTag}>{String(i + 1).padStart(2, "0")}</Text>
+                      <Text style={styles.categoriaTag}>
+                        {String(i + 1).padStart(2, "0")}
+                      </Text>
                       <Text style={styles.categoriaLabel}>categoría</Text>
                       <View style={styles.categoriaDot} />
-                      <Text style={styles.categoriaCount}>{c.animes.length} animes</Text>
+                      <Text style={styles.categoriaCount}>
+                        {c.animes.length} animes
+                      </Text>
                     </View>
-                    <Pressable onPress={() => router.push(`/categoria/${c.id}`)}>
-                      <Text style={styles.categoriaName}>{c.nombre.toLowerCase()}</Text>
+                    <Pressable
+                      onPress={() => router.push(`/categoria/${c.id}`)}
+                    >
+                      <Text style={styles.categoriaName}>
+                        {c.nombre.toLowerCase()}
+                      </Text>
                     </Pressable>
                     {c.descripcion !== "" && (
-                      <Text style={styles.categoriaDescription}>{c.descripcion}</Text>
+                      <Text style={styles.categoriaDescription}>
+                        {c.descripcion}
+                      </Text>
                     )}
 
                     {c.animes.length > 0 && (
@@ -136,12 +162,22 @@ export default function ResumenScreen() {
                           <Pressable
                             key={a.id}
                             style={styles.animeRow}
-                            onPress={() => router.push(`/anime/${c.id}/${a.id}`)}
+                            onPress={() =>
+                              router.push(`/anime/${c.id}/${a.id}`)
+                            }
                           >
                             {a.imagenes[0] ? (
-                              <Image source={{ uri: a.imagenes[0] }} style={styles.animeThumb} />
+                              <Image
+                                source={{ uri: a.imagenes[0] }}
+                                style={styles.animeThumb}
+                              />
                             ) : (
-                              <View style={[styles.animeThumb, styles.animeThumbEmpty]}>
+                              <View
+                                style={[
+                                  styles.animeThumb,
+                                  styles.animeThumbEmpty,
+                                ]}
+                              >
                                 <Text style={styles.animeThumbGlyph}>◆</Text>
                               </View>
                             )}
@@ -150,7 +186,11 @@ export default function ResumenScreen() {
                                 {a.titulo.toLowerCase()}
                               </Text>
                               <Text style={styles.animeMeta} numberOfLines={1}>
-                                {[a.genero, a.episodios && `${a.episodios} ep`, `${a.imagenes.length} img`]
+                                {[
+                                  a.genero,
+                                  a.episodios && `${a.episodios} ep`,
+                                  `${a.imagenes.length} img`,
+                                ]
                                   .filter(Boolean)
                                   .join(" · ")}
                               </Text>
@@ -166,9 +206,16 @@ export default function ResumenScreen() {
             )}
 
             {galeriaCompleta.length > 0 && (
-              <Pressable style={styles.imagesButton} onPress={() => setMostrarModal(true)}>
-                <Text style={styles.imagesButtonText}>▸ ver galería completa</Text>
-                <Text style={styles.imagesButtonCount}>{galeriaCompleta.length}</Text>
+              <Pressable
+                style={styles.imagesButton}
+                onPress={() => setMostrarModal(true)}
+              >
+                <Text style={styles.imagesButtonText}>
+                  ▸ ver galería completa
+                </Text>
+                <Text style={styles.imagesButtonCount}>
+                  {galeriaCompleta.length}
+                </Text>
               </Pressable>
             )}
           </>
@@ -203,7 +250,12 @@ function PersonajeCard({
   label,
   tag,
 }: {
-  data: { nombre: string; descripcion: string; habilidades: string; imagenes: string[] };
+  data: {
+    nombre: string;
+    descripcion: string;
+    habilidades: string;
+    imagenes: string[];
+  };
   accent: string;
   label: string;
   tag: string;
@@ -226,7 +278,9 @@ function PersonajeCard({
       </View>
       <View style={styles.infoRow}>
         <Text style={styles.infoLabel}>imágenes</Text>
-        <Text style={[styles.infoValue, { color: accent }]}>{data.imagenes.length} recuperadas</Text>
+        <Text style={[styles.infoValue, { color: accent }]}>
+          {data.imagenes.length} recuperadas
+        </Text>
       </View>
     </View>
   );
