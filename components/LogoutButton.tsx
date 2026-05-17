@@ -1,6 +1,6 @@
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
-import { Alert, Pressable, StyleSheet, Text } from "react-native";
+import { Alert, Platform, Pressable, StyleSheet, Text } from "react-native";
 
 const BORDER = "#2A3458";
 const SURFACE = "#141A2E";
@@ -13,17 +13,22 @@ export default function LogoutButton() {
 
   if (!user) return null;
 
+  const cerrar = () => {
+    logout();
+    router.replace("/login");
+  };
+
   const confirmar = () => {
-    Alert.alert("cerrar sesión", `¿salir de la sesión de ${user.displayName}?`, [
+    const mensaje = `¿salir de la sesión de ${user.displayName}?`;
+    if (Platform.OS === "web") {
+      if (typeof window !== "undefined" && window.confirm(mensaje)) {
+        cerrar();
+      }
+      return;
+    }
+    Alert.alert("cerrar sesión", mensaje, [
       { text: "cancelar", style: "cancel" },
-      {
-        text: "cerrar sesión",
-        style: "destructive",
-        onPress: () => {
-          logout();
-          router.replace("/login");
-        },
-      },
+      { text: "cerrar sesión", style: "destructive", onPress: cerrar },
     ]);
   };
 
