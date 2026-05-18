@@ -1,4 +1,5 @@
 import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { colors, sharedStyles } from "@/theme";
 
 interface ModalImagenesProps {
   visible: boolean;
@@ -16,15 +17,15 @@ export default function ModalImagenes({ visible, imagenes, onClose }: ModalImage
       animationType="fade"
       onRequestClose={onClose}
     >
-      <Pressable style={styles.backdrop} onPress={onClose}>
+      <Pressable style={sharedStyles.backdrop} onPress={onClose}>
         <View
-          style={styles.modalContainer}
+          style={sharedStyles.modalContainer}
           onStartShouldSetResponder={() => true}
         >
-          <View style={styles.header}>
-            <Text style={styles.title}>Imágenes ({total})</Text>
-            <Pressable style={styles.closeButton} onPress={onClose}>
-              <Text style={styles.closeButtonText}>✕</Text>
+          <View style={[sharedStyles.modalHeader, { backgroundColor: colors.primary }]}>
+            <Text style={sharedStyles.modalTitle}>Imágenes ({total})</Text>
+            <Pressable style={sharedStyles.closeButton} onPress={onClose}>
+              <Text style={[sharedStyles.closeButtonText, { color: colors.primary }]}>✕</Text>
             </Pressable>
           </View>
 
@@ -59,52 +60,6 @@ export default function ModalImagenes({ visible, imagenes, onClose }: ModalImage
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.75)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  modalContainer: {
-    width: "100%",
-    maxWidth: 500,
-    maxHeight: "85%",
-    backgroundColor: "#1a1a1a",
-    borderRadius: 20,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#b00",
-  },
-  title: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "bold",
-    letterSpacing: 0.5,
-  },
-  closeButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  closeButtonText: {
-    color: "#b00",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
   scrollView: {
     flex: 1,
   },
@@ -118,7 +73,7 @@ const styles = StyleSheet.create({
     padding: 40,
   },
   emptyText: {
-    color: "#f66",
+    color: colors.secondary,
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
@@ -126,16 +81,16 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
+    justifyContent: "center",
     gap: 16,
   },
   imageSlot: {
-    width: "48%",
+    width: "46%",
     alignItems: "center",
-    backgroundColor: "#2a2a2a",
+    backgroundColor: colors.surfaceLight,
     borderRadius: 12,
     padding: 12,
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -147,7 +102,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   imageLabel: {
-    color: "#ccc",
+    color: colors.textMuted,
     fontSize: 12,
     marginTop: 8,
     fontWeight: "600",

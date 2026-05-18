@@ -1,12 +1,17 @@
 import { Stack } from "expo-router";
+import { AuthProvider } from "../context/AuthContext";
 import { AnimeProvider } from "../context/AnimeContext";
 
 export default function RootLayout() {
   return (
-    <AnimeProvider>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
-    </AnimeProvider>
+    <AuthProvider>
+      <AnimeProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="auth" />
+          <Stack.Screen name="(tabs)" />
+        </Stack>
+      </AnimeProvider>
+    </AuthProvider>
   );
 }
