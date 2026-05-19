@@ -1,4 +1,6 @@
 import { useCategories } from "@/context/CategoriesContext";
+import * as ImageManipulator from "expo-image-manipulator";
+import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -47,9 +49,9 @@ export default function CategoriaDetalleScreen() {
   const [estado, setEstado] = useState("");
   const [notas, setNotas] = useState("");
   const [imagenes, setImagenes] = useState<string[]>([]);
-  const [nuevaImagen, setNuevaImagen] = useState("");
   const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [cargandoImagen, setCargandoImagen] = useState(false);
 
   if (!categoria) {
     if (loading) {
@@ -78,15 +80,46 @@ export default function CategoriaDetalleScreen() {
     );
   }
 
-  const agregarImagen = () => {
-    const url = nuevaImagen.trim();
-    if (!url) {
-      setError("ingresa una url de imagen");
-      return;
+  const seleccionarImagen = async () => {
+    if (cargandoImagen) return;
+    setCargandoImagen(true);
+    try {
+      const permiso = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permiso.granted) {
+        setError("necesitamos permiso para acceder a tus fotos");
+        return;
+      }
+      const resultado = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsMultipleSelection: true,
+        quality: 1,
+      });
+      if (resultado.canceled) return;
+      const dataUris: string[] = [];
+      for (const asset of resultado.assets) {
+        const context = ImageManipulator.ImageManipulator.manipulate(asset.uri);
+        context.resize({ width: 800 });
+        const image = await context.renderAsync();
+        const guardado = await image.saveAsync({
+          format: ImageManipulator.SaveFormat.JPEG,
+          compress: 0.6,
+          base64: true,
+        });
+        if (guardado.base64) {
+          dataUris.push(`data:image/jpeg;base64,${guardado.base64}`);
+        }
+      }
+      if (dataUris.length === 0) {
+        setError("no se pudo procesar la imagen seleccionada");
+        return;
+      }
+      setImagenes((prev) => [...prev, ...dataUris]);
+      setError("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "no se pudo cargar la imagen");
+    } finally {
+      setCargandoImagen(false);
     }
-    setImagenes((prev) => [...prev, url]);
-    setNuevaImagen("");
-    setError("");
   };
 
   const quitarImagen = (index: number) => {
@@ -102,7 +135,6 @@ export default function CategoriaDetalleScreen() {
     setEstado("");
     setNotas("");
     setImagenes([]);
-    setNuevaImagen("");
     setError("");
   };
 
@@ -192,20 +224,16 @@ export default function CategoriaDetalleScreen() {
           <CampoInput label="notas personales" value={notas} onChangeText={setNotas} placeholder="qué te pareció" multiline />
 
           <Text style={styles.label}>imágenes ({imagenes.length})</Text>
-          <View style={styles.addImagenRow}>
-            <TextInput
-              style={[styles.input, styles.addImagenInput]}
-              value={nuevaImagen}
-              onChangeText={setNuevaImagen}
-              placeholder="https://..."
-              placeholderTextColor={TEXT_MUTED}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-            <Pressable style={styles.addImagenButton} onPress={agregarImagen}>
-              <Text style={styles.addImagenButtonText}>+ añadir</Text>
-            </Pressable>
-          </View>
+          <Pressable
+            style={[styles.pickImagenButton, cargandoImagen && styles.buttonDisabled]}
+            onPress={seleccionarImagen}
+            disabled={cargandoImagen}
+          >
+            <Text style={styles.pickImagenButtonText}>
+              {cargandoImagen ? "▸ abriendo galería..." : "▸ elegir desde galería"}
+            </Text>
+            <Text style={styles.pickImagenHint}>selecciona una o varias imágenes de tu dispositivo</Text>
+          </Pressable>
 
           {imagenes.length > 0 && (
             <View style={styles.imagenesPreview}>
@@ -405,26 +433,29 @@ const styles = StyleSheet.create({
     minHeight: 70,
     textAlignVertical: "top",
   },
-  addImagenRow: {
-    flexDirection: "row",
-    gap: 8,
-    marginBottom: 12,
-  },
-  addImagenInput: {
-    flex: 1,
-  },
-  addImagenButton: {
-    paddingHorizontal: 14,
-    justifyContent: "center",
+  pickImagenButton: {
+    width: "100%",
     borderWidth: 1,
     borderColor: NEON_PURPLE,
     borderRadius: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 12,
+    alignItems: "center",
+    backgroundColor: "transparent",
   },
-  addImagenButtonText: {
+  pickImagenButtonText: {
     color: NEON_PURPLE,
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "500",
-    letterSpacing: 1.2,
+    letterSpacing: 2,
+  },
+  pickImagenHint: {
+    color: TEXT_MUTED,
+    fontSize: 11,
+    letterSpacing: 0.5,
+    marginTop: 6,
+    textAlign: "center",
   },
   imagenesPreview: {
     flexDirection: "row",
