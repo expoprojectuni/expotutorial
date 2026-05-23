@@ -6,12 +6,13 @@ import {
   LayoutChangeEvent,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const BG = "#0A0E1A";
 const SURFACE = "#141A2E";
@@ -40,6 +41,7 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   const { categorias } = useCategories();
   const router = useRouter();
   const pathname = usePathname();
+  const insets = useSafeAreaInsets();
   const scrollRef = useRef<ScrollView>(null);
 
   const [contentWidth, setContentWidth] = useState(0);
@@ -85,12 +87,12 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   const rutasVisibles = state.routes.filter((r) => TABS_VISIBLES.has(r.name));
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, { paddingBottom: insets.bottom }]}>
       <View style={styles.row} onLayout={onContainerLayout}>
         {puedeScrollIzq && (
-          <Pressable style={styles.arrow} onPress={() => scrollPor("izq")} hitSlop={6}>
+          <TouchableOpacity style={styles.arrow} onPress={() => scrollPor("izq")} hitSlop={6}>
             <Text style={styles.arrowText}>‹</Text>
-          </Pressable>
+          </TouchableOpacity>
         )}
 
         <ScrollView
@@ -102,6 +104,7 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
           contentContainerStyle={styles.scrollContent}
           onContentSizeChange={onContentLayout}
           style={styles.scroll}
+          keyboardShouldPersistTaps="handled"
         >
           {rutasVisibles.map((route) => {
             const enCategorias = route.name === "categorias" && categoriaActivaId !== null;
@@ -123,7 +126,7 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
             };
 
             return (
-              <Pressable
+              <TouchableOpacity
                 key={route.key}
                 onPress={onPress}
                 style={[styles.tab, enfocada && styles.tabActive]}
@@ -132,14 +135,14 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
                   {titulo}
                 </Text>
                 {enfocada && <View style={styles.activeBar} />}
-              </Pressable>
+              </TouchableOpacity>
             );
           })}
 
           {categorias.map((c) => {
             const enfocada = categoriaActivaId === c.id;
             return (
-              <Pressable
+              <TouchableOpacity
                 key={c.id}
                 onPress={() => irACategoria(c.id)}
                 style={[styles.tab, styles.tabDynamic, enfocada && styles.tabActive]}
@@ -152,15 +155,15 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
                   {c.nombre.toLowerCase()}
                 </Text>
                 {enfocada && <View style={styles.activeBar} />}
-              </Pressable>
+              </TouchableOpacity>
             );
           })}
         </ScrollView>
 
         {puedeScrollDer && (
-          <Pressable style={styles.arrow} onPress={() => scrollPor("der")} hitSlop={6}>
+          <TouchableOpacity style={styles.arrow} onPress={() => scrollPor("der")} hitSlop={6}>
             <Text style={styles.arrowText}>›</Text>
-          </Pressable>
+          </TouchableOpacity>
         )}
       </View>
     </View>

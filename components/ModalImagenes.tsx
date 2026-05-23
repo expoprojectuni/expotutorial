@@ -1,4 +1,5 @@
-import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image } from "expo-image";
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 const BG = "#0A0E1A";
 const SURFACE = "#141A2E";

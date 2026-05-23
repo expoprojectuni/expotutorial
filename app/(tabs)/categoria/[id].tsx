@@ -27,6 +27,10 @@ const NEON_PURPLE = "#B14EFF";
 const ACCENT_SOFT = "#B14EFF22";
 const DANGER = "#FF2E93";
 
+const MAX_IMAGENES = 8;
+const IMAGEN_WIDTH = 600;
+const IMAGEN_COMPRESS = 0.4;
+
 export default function CategoriaDetalleScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -82,6 +86,10 @@ export default function CategoriaDetalleScreen() {
 
   const seleccionarImagen = async () => {
     if (cargandoImagen) return;
+    if (imagenes.length >= MAX_IMAGENES) {
+      setError(`solo puedes adjuntar hasta ${MAX_IMAGENES} imágenes por anime`);
+      return;
+    }
     setCargandoImagen(true);
     try {
       const permiso = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -89,20 +97,22 @@ export default function CategoriaDetalleScreen() {
         setError("necesitamos permiso para acceder a tus fotos");
         return;
       }
+      const restantes = MAX_IMAGENES - imagenes.length;
       const resultado = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsMultipleSelection: true,
+        selectionLimit: restantes,
         quality: 1,
       });
       if (resultado.canceled) return;
       const dataUris: string[] = [];
-      for (const asset of resultado.assets) {
+      for (const asset of resultado.assets.slice(0, restantes)) {
         const context = ImageManipulator.ImageManipulator.manipulate(asset.uri);
-        context.resize({ width: 800 });
+        context.resize({ width: IMAGEN_WIDTH });
         const image = await context.renderAsync();
         const guardado = await image.saveAsync({
           format: ImageManipulator.SaveFormat.JPEG,
-          compress: 0.6,
+          compress: IMAGEN_COMPRESS,
           base64: true,
         });
         if (guardado.base64) {
@@ -113,7 +123,7 @@ export default function CategoriaDetalleScreen() {
         setError("no se pudo procesar la imagen seleccionada");
         return;
       }
-      setImagenes((prev) => [...prev, ...dataUris]);
+      setImagenes((prev) => [...prev, ...dataUris].slice(0, MAX_IMAGENES));
       setError("");
     } catch (e) {
       setError(e instanceof Error ? e.message : "no se pudo cargar la imagen");
@@ -223,16 +233,25 @@ export default function CategoriaDetalleScreen() {
           <CampoInput label="estado" value={estado} onChangeText={setEstado} placeholder="ej: finalizado, en emisión..." />
           <CampoInput label="notas personales" value={notas} onChangeText={setNotas} placeholder="qué te pareció" multiline />
 
-          <Text style={styles.label}>imágenes ({imagenes.length})</Text>
+          <Text style={styles.label}>imágenes ({imagenes.length}/{MAX_IMAGENES})</Text>
           <Pressable
-            style={[styles.pickImagenButton, cargandoImagen && styles.buttonDisabled]}
+            style={[
+              styles.pickImagenButton,
+              (cargandoImagen || imagenes.length >= MAX_IMAGENES) && styles.buttonDisabled,
+            ]}
             onPress={seleccionarImagen}
-            disabled={cargandoImagen}
+            disabled={cargandoImagen || imagenes.length >= MAX_IMAGENES}
           >
             <Text style={styles.pickImagenButtonText}>
-              {cargandoImagen ? "▸ abriendo galería..." : "▸ elegir desde galería"}
+              {cargandoImagen
+                ? "▸ abriendo galería..."
+                : imagenes.length >= MAX_IMAGENES
+                  ? "▸ máximo alcanzado"
+                  : "▸ elegir desde galería"}
             </Text>
-            <Text style={styles.pickImagenHint}>selecciona una o varias imágenes de tu dispositivo</Text>
+            <Text style={styles.pickImagenHint}>
+              hasta {MAX_IMAGENES} imágenes · se comprimen automáticamente
+            </Text>
           </Pressable>
 
           {imagenes.length > 0 && (

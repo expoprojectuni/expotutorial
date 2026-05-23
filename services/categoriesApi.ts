@@ -30,7 +30,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const data = (await res.json().catch(() => null)) as { error?: string } | T | null;
 
   if (!res.ok) {
-    const msg = (data as { error?: string } | null)?.error ?? `error ${res.status}`;
+    const fallback =
+      res.status === 413
+        ? "las imágenes son muy pesadas, intenta con menos o más livianas"
+        : `error ${res.status}`;
+    const msg = (data as { error?: string } | null)?.error ?? fallback;
     throw new ApiError(msg, res.status);
   }
   return data as T;
