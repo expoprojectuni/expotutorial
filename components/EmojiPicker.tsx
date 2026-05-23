@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   modalContent: {
     height: "25%",
     width: "100%",
-    backgroundColor: "#25292e",
+    backgroundColor: "#0a1929",
     borderTopRightRadius: 18,
     borderTopLeftRadius: 18,
     position: "absolute",
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     height: "16%",
-    backgroundColor: "#464C55",
+    backgroundColor: "#1a202c",
     borderTopRightRadius: 10,
     borderTopLeftRadius: 10,
     paddingHorizontal: 20,

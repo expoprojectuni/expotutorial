@@ -1,6 +1,6 @@
 import domtoimage from "dom-to-image";
 import * as ImagePicker from "expo-image-picker";
-import * as MediaLibrary from "expo-media-library/legacy";
+import * as MediaLibrary from "expo-media-library";
 import { useEffect, useRef, useState } from "react";
 import { ImageSourcePropType, Platform, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -143,7 +143,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#25292e",
+    backgroundColor: "#0a1929",
     alignItems: "center",
   },
   imageContainer: {
